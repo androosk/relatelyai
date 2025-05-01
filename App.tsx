@@ -36,11 +36,7 @@ function MainTabs() {
         tabBarActiveTintColor: '#6366f1', // Indigo color
         tabBarInactiveTintColor: 'gray',
       })}>
-      <Tab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{ headerShown: false }} // Hide the header for the home screen
-      />
+      <Tab.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
       <Tab.Screen name="Quiz" component={QuizScreen} />
       <Tab.Screen name="Check In" component={CheckInScreen} />
       <Tab.Screen name="Chat" component={ChatScreen} />

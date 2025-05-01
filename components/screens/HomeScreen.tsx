@@ -1,6 +1,24 @@
-import { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, useColorScheme } from 'react-native';
+import { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Appearance } from 'react-native';
 import { Bell, MessageCircle, Book, Calendar, Heart } from 'lucide-react-native';
+import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+type TabParamList = {
+  Home: undefined;
+  Quiz: undefined;
+  'Check In': undefined;
+  Chat: undefined;
+  Resources: undefined;
+};
+type StackParamList = {
+  Main: undefined;
+};
+type HomeScreenNavigationProp = CompositeNavigationProp<
+  BottomTabNavigationProp<TabParamList, 'Home'>,
+  NativeStackNavigationProp<StackParamList>
+>;
 
 // Mock data
 const userData = {
@@ -21,9 +39,24 @@ const relationshipTips = [
 
 const HomeScreen = () => {
   const [currentTip, setCurrentTip] = useState(0);
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const [isDark, setIsDark] = useState(Appearance.getColorScheme() === 'dark');
+  const navigation = useNavigation<HomeScreenNavigationProp>();
 
+  useEffect(() => {
+    // Set up the listener for theme changes
+    const subscription = Appearance.addChangeListener(({ colorScheme }) => {
+      console.log('Theme changed to:', colorScheme); // For debugging
+      setIsDark(colorScheme === 'dark');
+    });
+
+    return () => subscription.remove();
+  }, []);
+
+  const updateTheme = () => {
+    const colorScheme = Appearance.getColorScheme();
+    console.log('Current color scheme:', colorScheme); // For debugging
+    setIsDark(colorScheme === 'dark');
+  };
   // Theme colors
   const colors = {
     background: isDark ? 'bg-gray-900' : 'bg-white',
@@ -60,7 +93,6 @@ const HomeScreen = () => {
 
   return (
     <View className={`flex-1 ${colors.background}`}>
-      {/* Top bar with user icon, app name, and notification bell */}
       <View
         className={`flex-row items-center justify-between border-b px-4 pb-3 pt-16 ${colors.border}`}>
         <View className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-300">
@@ -106,7 +138,9 @@ const HomeScreen = () => {
             Last check-in: {userData.lastCheckIn}. Keep the momentum going!
           </Text>
 
-          <TouchableOpacity className="mt-4 self-center rounded-full bg-blue-500 px-4 py-2">
+          <TouchableOpacity
+            className="mt-4 self-center rounded-full bg-blue-500 px-4 py-2"
+            onPress={() => navigation.navigate('Check In')}>
             <Text className="font-semibold text-white">Add New Check-In</Text>
           </TouchableOpacity>
         </View>
@@ -131,7 +165,9 @@ const HomeScreen = () => {
               </Text>
               <Text className={colors.textSecondary}>Day Streak</Text>
             </View>
-            <TouchableOpacity className="rounded-full bg-blue-500 px-4 py-2">
+            <TouchableOpacity
+              className="flex justify-center rounded-full bg-blue-500 px-4 py-2"
+              onPress={() => navigation.navigate('Quiz')}>
               <Text className="font-semibold text-white">Take Quiz Again</Text>
             </TouchableOpacity>
           </View>
