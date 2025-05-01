@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, TextInput, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import EmotionSelector from '../ui/EmotionSelector';
+import { checkinService } from 'components/services/checkinService';
 
 // In a real app, you'd use Supabase to save/retrieve these
 const mockCheckIns = [
@@ -11,29 +12,77 @@ const mockCheckIns = [
 ];
 
 export default function CheckInScreen() {
-  const [checkIns, setCheckIns] = useState(mockCheckIns);
+  const [checkIns, setCheckIns] = useState<any[]>([]);
   const [currentEmotion, setCurrentEmotion] = useState(3); // Middle emotion
   const [notes, setNotes] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const saveCheckIn = () => {
-    const today = new Date().toISOString().split('T')[0];
-    const newCheckIn = {
-      id: Date.now(),
-      date: today,
-      emotion: currentEmotion,
-      notes: notes.trim(),
-    };
+  useEffect(() => {
+    loadCheckIns();
+  }, []);
 
-    setCheckIns([newCheckIn, ...checkIns]);
-    setNotes('');
+  const loadCheckIns = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await checkinService.getCheckinHistory();
+      setCheckIns(data);
+    } catch (err) {
+      console.error('Failed to load check-ins:', err);
+      setError('Failed to load check-ins. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    // In a real app, save to Supabase here
-    // supabase.from('checkins').insert([newCheckIn])
+  // const saveCheckIn = () => {
+  //   const today = new Date().toISOString().split('T')[0];
+  //   const newCheckIn = {
+  //     id: Date.now(),
+  //     date: today,
+  //     emotion: currentEmotion,
+  //     notes: notes.trim(),
+  //   };
+
+  //   setCheckIns([newCheckIn, ...checkIns]);
+  //   setNotes('');
+
+  //   // In a real app, save to Supabase here
+  //   // supabase.from('checkins').insert([newCheckIn])
+  // };
+
+  const saveCheckIn = async () => {
+    if (saving) return;
+
+    try {
+      setSaving(true);
+      setError(null);
+
+      // Save to Supabase using the service
+      await checkinService.createCheckin(
+        currentEmotion,
+        notes.trim(),
+        [] // Empty tags array for now, could be added as a feature later
+      );
+
+      // Reset form
+      setNotes('');
+
+      // Reload check-ins to show the latest
+      await loadCheckIns();
+    } catch (err) {
+      console.error('Failed to save check-in:', err);
+      setError('Failed to save check-in. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const getEmotionText = (emotion: number) => {
     const emotions = ['Very Sad', 'Sad', 'Neutral', 'Happy', 'Very Happy'];
-    return emotions[emotion];
+    return emotions[emotion - 1];
   };
 
   const formatDate = (dateStr: string) => {
@@ -43,6 +92,17 @@ export default function CheckInScreen() {
       month: 'short',
       day: 'numeric',
     });
+  };
+
+  const handleDeleteCheckin = async (id: string) => {
+    try {
+      await checkinService.deleteCheckin(id);
+      // Filter out the deleted check-in
+      setCheckIns(checkIns.filter((checkin) => checkin.id !== id));
+    } catch (err) {
+      console.error('Failed to delete check-in:', err);
+      setError('Failed to delete check-in. Please try again.');
+    }
   };
 
   return (

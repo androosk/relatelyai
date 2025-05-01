@@ -14,6 +14,8 @@ type TabParamList = {
 };
 type StackParamList = {
   Main: undefined;
+  Profile: undefined;
+  EditProfile: undefined;
 };
 type HomeScreenNavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<TabParamList, 'Home'>,
@@ -95,9 +97,11 @@ const HomeScreen = () => {
     <View className={`flex-1 ${colors.background}`}>
       <View
         className={`flex-row items-center justify-between border-b px-4 pb-3 pt-16 ${colors.border}`}>
-        <View className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-300">
+        <TouchableOpacity
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-300"
+          onPress={() => navigation.navigate('Profile')}>
           <Text className="text-lg font-bold">{userData.name.charAt(0)}</Text>
-        </View>
+        </TouchableOpacity>
 
         <Text className="text-2xl font-bold text-blue-500">RelatelyAI</Text>
 
