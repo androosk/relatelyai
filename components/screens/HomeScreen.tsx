@@ -47,7 +47,6 @@ const HomeScreen = () => {
   useEffect(() => {
     // Set up the listener for theme changes
     const subscription = Appearance.addChangeListener(({ colorScheme }) => {
-      console.log('Theme changed to:', colorScheme); // For debugging
       setIsDark(colorScheme === 'dark');
     });
 
@@ -56,7 +55,6 @@ const HomeScreen = () => {
 
   const updateTheme = () => {
     const colorScheme = Appearance.getColorScheme();
-    console.log('Current color scheme:', colorScheme); // For debugging
     setIsDark(colorScheme === 'dark');
   };
   // Theme colors

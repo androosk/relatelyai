@@ -71,7 +71,6 @@ export const checkinService = {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    console.log('User:', user);
     if (!user) throw new Error('User not found');
 
     const { data, error } = await supabase
@@ -84,8 +83,6 @@ export const checkinService = {
     if (error) {
       console.error('Error fetching check-in history:', error);
     }
-
-    console.log('Check-in history:', data);
 
     return (data || []) as unknown as Checkin[];
   },
