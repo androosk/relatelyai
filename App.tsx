@@ -173,12 +173,12 @@ const RootNavigator = () => {
 // Main App component
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <AuthProvider>
-        <NavigationContainer>
+    <NavigationContainer>
+      <SafeAreaProvider>
+        <AuthProvider>
           <RootNavigator />
-        </NavigationContainer>
-      </AuthProvider>
-    </SafeAreaProvider>
+        </AuthProvider>
+      </SafeAreaProvider>
+    </NavigationContainer>
   );
 }
