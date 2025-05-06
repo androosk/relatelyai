@@ -1,15 +1,12 @@
 import { supabase } from 'api/supabase';
-
-interface Checkin {
+export interface Checkin {
   id: string;
   user_id: string;
   mood_score: number;
-  notes: string;
-  tags: string[];
-  created_at: string;
-  [key: string]: any; // Additional checkin fields
+  created_at: string | null; // Changed to allow null
+  notes?: string | null;
+  tags?: string[] | null;
 }
-
 interface CheckinUpdates {
   mood_score?: number;
   notes?: string;
@@ -132,8 +129,7 @@ export const checkinService = {
     }
 
     const moodData = data.reduce((acc: MoodAccumulator, item) => {
-      // Format as YYYY-MM-DD
-      const date = new Date(item.created_at);
+      const date = new Date(item.created_at || '');
       const day = date.toISOString().split('T')[0];
 
       if (!acc[day]) {

@@ -1,6 +1,7 @@
 import { View, Text, TouchableOpacity } from 'react-native';
 
 interface QuizQuestionProps {
+  questionNumber: number;
   question: string;
   options: string[];
   selectedOption: number;
@@ -8,6 +9,7 @@ interface QuizQuestionProps {
 }
 
 export default function QuizQuestion({
+  questionNumber,
   question,
   options,
   selectedOption,
@@ -15,7 +17,7 @@ export default function QuizQuestion({
 }: QuizQuestionProps) {
   return (
     <View className="mb-6 rounded-lg bg-white p-4 shadow">
-      <Text className="mb-3 text-lg font-semibold">{question}</Text>
+      <Text className="mb-3 text-lg font-semibold">{`${questionNumber}. ${question}`}</Text>
 
       {options.map((option, index) => (
         <TouchableOpacity

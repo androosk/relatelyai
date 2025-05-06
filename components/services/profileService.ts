@@ -55,7 +55,7 @@ export const profileService = {
       .from('profiles')
       .update({
         ...updates,
-        updated_at: new Date(),
+        updated_at: new Date().toISOString(),
       })
       .eq('id', user.id)
       .select();

@@ -1,23 +1,9 @@
-import React, { useState } from 'react';
-import { ScrollView, View, Text, TouchableOpacity } from 'react-native';
+import { useState } from 'react';
+import { ScrollView, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import QuizQuestion from 'components/ui/QuizQuestion';
 import { supabase } from 'api/supabase';
-// import type { RootStackParamList } from '../navigation/types';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useNavigation } from '@react-navigation/native';
-
-export type RootStackParamList = {
-  QuizScreen: undefined;
-  RelationshipHealthQuiz: undefined;
-  StayOrLeaveQuiz: undefined;
-};
-
-interface Question {
-  id: number;
-  question: string;
-  options: string[];
-}
+import { quizService, Question } from 'components/services/quizService';
 
 const questions: Question[] = [
   {
@@ -122,10 +108,7 @@ const questions: Question[] = [
   },
 ];
 
-type StayOrLeaveNavProp = NativeStackNavigationProp<RootStackParamList, 'StayOrLeaveQuiz'>;
-
 const StayOrLeaveQuiz: React.FC = () => {
-  const navigation = useNavigation<StayOrLeaveNavProp>();
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [result, setResult] = useState<string>('');
 
@@ -140,16 +123,27 @@ const StayOrLeaveQuiz: React.FC = () => {
     return (total / (vals.length * 4)) * 100;
   };
 
-  const submitQuiz = async (): Promise<void> => {
-    const score = calculateScore();
-    const { error } = await supabase.from('stay_or_leave').insert({ score, answers });
-    if (error) console.error('Supabase insert error:', error.message);
-    setResult(
-      score >= 60
-        ? `Your relationship is ${Math.round(score)}% meeting your needs. Consider discussing concerns.`
-        : `Your relationship is ${Math.round(score)}% fulfilling. You may want to reflect on staying or leaving.`
-    );
-  };
+  async function submitQuiz(): Promise<void> {
+    const score = Math.round(calculateScore());
+    const assessmentText = await quizService.getStayOrLeaveAssessmentText(score);
+
+    console.log('Assessment:', assessmentText);
+
+    const { error } = await supabase.from('quizzes').insert({
+      user_id: (await supabase.auth.getUser()).data.user?.id!,
+      score,
+      assessment: assessmentText,
+      answers,
+      quiz_type: 'stayorleave',
+    });
+
+    if (error) {
+      console.error('Insert failed:', error);
+      return;
+    }
+    console.log(`Your relationship health is ${score}%`);
+    setResult(`Your relationship health is ${score}%`);
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-white p-6">
@@ -157,6 +151,7 @@ const StayOrLeaveQuiz: React.FC = () => {
         <Text className="mb-4 text-2xl font-bold">Should I Stay or Leave?</Text>
         {questions.map((q) => (
           <QuizQuestion
+            questionNumber={q.id}
             key={q.id}
             question={q.question}
             options={q.options}

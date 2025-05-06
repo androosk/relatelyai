@@ -1,14 +1,9 @@
-import React, { useState } from 'react';
-import { ScrollView, View, Text, TouchableOpacity } from 'react-native';
+import { useState } from 'react';
+import { ScrollView, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import QuizQuestion from 'components/ui/QuizQuestion';
 import { supabase } from 'api/supabase';
-
-interface Question {
-  id: number;
-  question: string;
-  options: string[];
-}
+import { quizService, Question } from 'components/services/quizService';
 
 const questions: Question[] = [
   {
@@ -79,12 +74,29 @@ const RelationshipHealthQuiz: React.FC = () => {
     return (total / (vals.length * 4)) * 100;
   };
 
-  const submitQuiz = async (): Promise<void> => {
-    const score = calculateScore();
-    const { error } = await supabase.from('relationship_health').insert({ score, answers });
-    if (error) console.error('Supabase insert error:', error.message);
-    setResult(`Your relationship health is ${Math.round(score)}%`);
-  };
+  async function submitQuiz(): Promise<void> {
+    const score = Math.round(calculateScore());
+    const assessment = quizService.getRelationshipAssessmentText(score);
+
+    const assessmentText = assessment instanceof Promise ? await assessment : assessment;
+    console.log('Assessment:', assessmentText);
+
+    const { error } = await supabase.from('quizzes').insert({
+      user_id: (await supabase.auth.getUser()).data.user?.id!,
+      score,
+      assessment: assessmentText,
+      answers,
+      // Add missing required fields based on your type definition
+      quiz_type: 'relationship', // Default quiz type
+    });
+
+    if (error) {
+      console.error('Insert failed:', error);
+      return;
+    }
+    console.log(`Your relationship health is ${score}%`);
+    setResult(`Your relationship health is ${score}%`);
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-white p-6">
@@ -93,6 +105,7 @@ const RelationshipHealthQuiz: React.FC = () => {
         {questions.map((q) => (
           <QuizQuestion
             key={q.id}
+            questionNumber={q.id}
             question={q.question}
             options={q.options}
             selectedOption={answers[q.id] ?? -1}

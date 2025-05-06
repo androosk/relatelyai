@@ -34,7 +34,7 @@ export type RootStackParamList = {
 
 export type MainTabParamList = {
   Home: undefined;
-  Quiz: undefined;
+  Assessment: undefined;
   'Check In': undefined;
   Chat: undefined;
   Resources: undefined;
@@ -54,7 +54,7 @@ function MainTabs() {
           let iconName: 'home' | 'list-ol' | 'calendar-check-o' | 'comments' | 'book' = 'book';
           if (route.name === 'Home') {
             iconName = 'home';
-          } else if (route.name === 'Quiz') {
+          } else if (route.name === 'Assessment') {
             iconName = 'list-ol';
           } else if (route.name === 'Check In') {
             iconName = 'calendar-check-o';
@@ -70,7 +70,7 @@ function MainTabs() {
         tabBarInactiveTintColor: 'gray',
       })}>
       <Tab.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
-      <Tab.Screen name="Quiz" component={QuizStackNavigator} options={{ headerShown: false }} />
+      <Tab.Screen name="Assessment" component={QuizStackNavigator} />
       <Tab.Screen name="Check In" component={CheckInScreen} />
       <Tab.Screen name="Chat" component={ChatScreen} />
       <Tab.Screen name="Resources" component={ResourcesScreen} />
@@ -78,11 +78,9 @@ function MainTabs() {
   );
 }
 
-// Root navigator that handles auth flow
 const RootNavigator = () => {
   const { user, loading } = useAuth();
 
-  // Show loading screen while checking authentication
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center">
@@ -94,14 +92,12 @@ const RootNavigator = () => {
   return (
     <Stack.Navigator>
       {user ? (
-        // User is signed in - show main app
         <>
           <Stack.Screen name="App" component={MainTabs} options={{ headerShown: false }} />
           <Stack.Screen name="Profile" component={ProfileScreen} />
           <Stack.Screen name="EditProfile" component={EditProfileScreen} />
         </>
       ) : (
-        // User is not signed in - show auth screens
         <>
           <Stack.Screen name="SignIn" component={SignInScreen} options={{ headerShown: false }} />
           <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
