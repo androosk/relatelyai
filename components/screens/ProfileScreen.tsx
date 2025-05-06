@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-import { supabase } from '../../api/supabase';
-import { profileService } from 'components/services/profileService';
+import { profileService, Profile } from 'components/services/profileService';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from 'App';
 import { useAuth } from '../contexts/AuthContext';
@@ -14,9 +13,7 @@ type ProfileScreenProps = {
 
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const [loading, setLoading] = useState<boolean>(true);
-  const [username, setUsername] = useState<string>('');
-  const [relationshipStatus, setRelationshipStatus] = useState<string>('');
-  const [partnerName, setPartnerName] = useState<string>('');
+  const [userProfile, setUserProfile] = useState<Profile>();
   const { signOut } = useAuth();
   const { getProfile } = profileService;
 
@@ -30,9 +27,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       const profile = await getProfile();
 
       if (profile) {
-        setUsername(profile.username || '');
-        setRelationshipStatus(profile.relationship_status || '');
-        setPartnerName(profile.partner_name || '');
+        setUserProfile(profile);
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -65,22 +60,64 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       <View className="rounded-xl bg-white p-6 shadow-sm">
         <Text className="mb-6 text-center text-2xl font-bold text-gray-800">Your Profile</Text>
 
-        <View className="mb-4">
+        {/* <View className="mb-4">
           <Text className="mb-1 text-sm font-medium text-gray-500">Username</Text>
-          <Text className="text-lg font-medium text-gray-800">{username || 'Not set'}</Text>
+          <Text className="text-lg font-medium text-gray-800">
+            {userProfile?.username || 'Not set'}
+          </Text>
+        </View> */}
+
+        <View className="mb-4">
+          <Text className="mb-1 text-sm font-medium text-gray-500">First Name</Text>
+          <Text className="text-lg font-medium text-gray-800">
+            {userProfile?.first_name || 'Not set'}
+          </Text>
+        </View>
+
+        <View className="mb-4">
+          <Text className="mb-1 text-sm font-medium text-gray-500">Last Name</Text>
+          <Text className="text-lg font-medium text-gray-800">
+            {userProfile?.last_name || 'Not set'}
+          </Text>
         </View>
 
         <View className="mb-4">
           <Text className="mb-1 text-sm font-medium text-gray-500">Relationship Status</Text>
           <Text className="text-lg font-medium text-gray-800">
-            {relationshipStatus || 'Not set'}
+            {userProfile?.relationship_status || 'Not set'}
           </Text>
         </View>
 
-        {relationshipStatus !== 'Single' && relationshipStatus !== '' && (
+        {userProfile?.relationship_start_date && (
+          <View className="mb-4">
+            <Text className="mb-1 text-sm font-medium text-gray-500">{`First Date`}</Text>
+            <Text className="text-lg font-medium text-gray-800">
+              {userProfile?.relationship_start_date}
+            </Text>
+          </View>
+        )}
+
+        {userProfile?.anniversary_date && (
+          <View className="mb-4">
+            <Text className="mb-1 text-sm font-medium text-gray-500">{`Anniversary`}</Text>
+            <Text className="text-lg font-medium text-gray-800">
+              {userProfile?.anniversary_date}
+            </Text>
+          </View>
+        )}
+
+        {userProfile?.partner_name && (
           <View className="mb-4">
             <Text className="mb-1 text-sm font-medium text-gray-500">Partner Name</Text>
-            <Text className="text-lg font-medium text-gray-800">{partnerName || 'Not set'}</Text>
+            <Text className="text-lg font-medium text-gray-800">{userProfile?.partner_name}</Text>
+          </View>
+        )}
+        {userProfile?.partner_name && (
+          <View className="mb-4">
+            <Text className="mb-1 text-sm font-medium text-gray-500">{`${userProfile.partner_name}'s Birthday`}</Text>
+            <Text className="text-lg font-medium text-gray-800">
+              {userProfile?.partner_birthdate || 'Not set'}
+            </Text>
           </View>
         )}
 

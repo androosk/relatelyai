@@ -38,26 +38,71 @@ export type Database = {
       }
       profiles: {
         Row: {
+          age: number | null
+          anniversary_date: string | null
+          bio: string | null
           created_at: string | null
+          device_token: string | null
+          email_notifications: boolean | null
+          first_name: string | null
           id: string
+          last_name: string | null
+          love_languages: string[] | null
+          partner_birthdate: string | null
           partner_name: string | null
+          phone_number: string | null
+          profile_picture_url: string | null
+          push_notifications: boolean | null
+          relationship_goals: Json | null
+          relationship_start_date: string | null
           relationship_status: string | null
+          text_notifications: boolean | null
           updated_at: string | null
           username: string | null
         }
         Insert: {
+          age?: number | null
+          anniversary_date?: string | null
+          bio?: string | null
           created_at?: string | null
+          device_token?: string | null
+          email_notifications?: boolean | null
+          first_name?: string | null
           id: string
+          last_name?: string | null
+          love_languages?: string[] | null
+          partner_birthdate?: string | null
           partner_name?: string | null
+          phone_number?: string | null
+          profile_picture_url?: string | null
+          push_notifications?: boolean | null
+          relationship_goals?: Json | null
+          relationship_start_date?: string | null
           relationship_status?: string | null
+          text_notifications?: boolean | null
           updated_at?: string | null
           username?: string | null
         }
         Update: {
+          age?: number | null
+          anniversary_date?: string | null
+          bio?: string | null
           created_at?: string | null
+          device_token?: string | null
+          email_notifications?: boolean | null
+          first_name?: string | null
           id?: string
+          last_name?: string | null
+          love_languages?: string[] | null
+          partner_birthdate?: string | null
           partner_name?: string | null
+          phone_number?: string | null
+          profile_picture_url?: string | null
+          push_notifications?: boolean | null
+          relationship_goals?: Json | null
+          relationship_start_date?: string | null
           relationship_status?: string | null
+          text_notifications?: boolean | null
           updated_at?: string | null
           username?: string | null
         }

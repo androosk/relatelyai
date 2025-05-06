@@ -16,10 +16,28 @@ interface SupabaseResponse<T> {
   } | null;
 }
 
-interface Profile {
+export interface Profile {
   id: string;
   updated_at: Date;
-  [key: string]: any; // Additional profile fields
+  username?: string;
+  first_name?: string;
+  last_name?: string;
+  partner_name?: string;
+  age?: number;
+  bio?: string;
+  profile_picture_url?: string;
+  email_notifications: boolean;
+  text_notifications: boolean;
+  phone_number?: string;
+  push_notifications: boolean;
+  device_token?: string;
+  relationship_start_date?: string;
+  relationship_status: string;
+  anniversary_date: string;
+  partner_birthdate?: string;
+  love_languages?: string[];
+  relationship_goals: JSON;
+  error?: string;
 }
 
 interface ProfileUpdates {
