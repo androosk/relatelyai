@@ -16,6 +16,7 @@
     "submit:ios": "eas submit -p ios"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.50.4",
     "@react-native-async-storage/async-storage": "^2.1.2",
     "@react-native-community/datetimepicker": "^8.3.0",
     "@react-native-picker/picker": "^2.11.0",
