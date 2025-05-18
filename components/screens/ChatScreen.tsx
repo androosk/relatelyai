@@ -1,5 +1,4 @@
-// ChatScreen.tsx
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,112 +7,165 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { FontAwesome } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
+import { useChat } from 'hooks/useChat';
+import { Message } from 'types/chat';
+import { format } from 'date-fns';
+import { useNavigation } from '@react-navigation/native';
+import { ChatScreenNavigationProp } from 'types/navigation';
 
-type Message = {
-  id: string;
-  text: string;
-  isUser: boolean;
+// Helper function for safe date formatting
+const safeFormat = (date: Date, formatString: string): string => {
+  try {
+    return format(date, formatString);
+  } catch (error) {
+    console.warn('Error formatting date:', error);
+    return 'Just now'; // Fallback string
+  }
 };
 
-export default function ChatScreen() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: "Hello! I'm RelatelyAI. How can I help with your relationship questions today?",
-      isUser: false,
-    },
-  ]);
-  const [input, setInput] = useState('');
+const ChatScreen = () => {
+  const { currentSession, messages, loading, error, startNewChat, sendUserMessage } = useChat();
+  const navigation = useNavigation<ChatScreenNavigationProp>();
+
+  const [inputText, setInputText] = useState('');
   const flatListRef = useRef<FlatList>(null);
 
-  // Mock AI responses - in production, you'd connect to an AI service
-  const relationshipResponses = [
-    'Communication is key in any relationship. Have you tried setting aside dedicated time to talk?',
-    "It sounds like you might be experiencing some trust issues. Can you tell me more about what's causing these feelings?",
-    'Boundaries are important in healthy relationships. Consider discussing your needs openly with your partner.',
-    'Many couples find that scheduling regular date nights helps them stay connected.',
-    "It's normal to have disagreements. The important thing is how you work through them together.",
-    'Self-care is important too. Taking time for yourself can actually benefit your relationship.',
-  ];
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    if (messages.length > 0 && flatListRef.current) {
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    }
+  }, [messages]);
 
-  const getAIResponse = (userMessage: string) => {
-    // Basic mock response - in production, you'd connect to a proper AI service
-    // For now, just selecting a random response
-    const randomIndex = Math.floor(Math.random() * relationshipResponses.length);
-    return relationshipResponses[randomIndex];
+  // Start a new chat if there's no active session
+  useEffect(() => {
+    if (!currentSession) {
+      startNewChat();
+    }
+  }, [currentSession, startNewChat]);
+
+  const handleSend = () => {
+    if (inputText.trim() === '' || loading) return;
+
+    sendUserMessage(inputText.trim());
+    setInputText('');
   };
 
-  const sendMessage = () => {
-    if (!input.trim()) return;
-
-    // Add user message
-    const userMessage = {
-      id: Date.now().toString(),
-      text: input.trim(),
-      isUser: true,
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
-    setInput('');
-
-    // Simulate AI response (with slight delay)
-    setTimeout(() => {
-      const aiResponse = {
-        id: (Date.now() + 1).toString(),
-        text: getAIResponse(input),
-        isUser: false,
-      };
-      setMessages((prev) => [...prev, aiResponse]);
-
-      // Scroll to bottom
-      flatListRef.current?.scrollToEnd({ animated: true });
-    }, 1000);
+  const navigateToHistory = () => {
+    navigation.navigate('ChatHistory');
   };
 
-  const renderMessage = ({ item }: { item: Message }) => (
-    <View
-      className={`max-w-4/5 my-1 rounded-lg p-3 ${
-        item.isUser ? 'self-end bg-indigo-600' : 'self-start bg-gray-200'
-      }`}>
-      <Text className={item.isUser ? 'text-white' : 'text-gray-800'}>{item.text}</Text>
-    </View>
-  );
+  const renderMessage = ({ item }: { item: Message }) => {
+    const isUser = item.role === 'user';
+
+    return (
+      <View
+        className={`mb-2 max-w-[80%] rounded-2xl px-4 py-3 ${
+          isUser
+            ? 'self-end rounded-br-sm bg-indigo-600'
+            : 'self-start rounded-bl-sm border border-gray-200 bg-white'
+        }`}>
+        <Text className={`text-base leading-[22px] ${isUser ? 'text-white' : 'text-gray-800'}`}>
+          {item.content}
+        </Text>
+        <Text className="mt-1 self-end text-xs text-gray-400">
+          {safeFormat(item.createdAt, 'h:mm a')}
+        </Text>
+      </View>
+    );
+  };
+
+  const renderWelcomeMessage = () => {
+    if (messages.length > 0) return null;
+
+    return (
+      <View className="mb-6 rounded-xl border border-gray-200 bg-white p-4">
+        <Text className="mb-2 text-lg font-bold text-gray-900">Welcome to Relately Chat</Text>
+        <Text className="text-base leading-[22px] text-gray-600">
+          I'm your relationship advisor. Feel free to ask me for advice, insights, or communication
+          tips for your relationship.
+        </Text>
+      </View>
+    );
+  };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1">
-        <View className="flex-1 px-4 pt-2">
-          <Text className="mb-4 text-xl font-bold text-indigo-600">Relationship Advisor</Text>
+    <KeyboardAvoidingView
+      className="flex-1 bg-gray-50"
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
+      {error ? (
+        <View className="flex-1 items-center justify-center p-6">
+          <Text className="mb-4 text-center text-base text-red-500">{error}</Text>
+          <TouchableOpacity
+            className="rounded-lg bg-indigo-600 px-5 py-2.5"
+            onPress={() => startNewChat()}>
+            <Text className="text-base font-bold text-white">Retry</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <>
+          <View className="flex-row items-center justify-between border-b border-gray-200 bg-white p-4">
+            <Text className="text-lg font-bold text-indigo-600">Relationship Advisor</Text>
+            <TouchableOpacity className="rounded-lg p-2" onPress={navigateToHistory}>
+              <Ionicons name="list" size={24} color="#4F46E5" />
+            </TouchableOpacity>
+          </View>
 
           <FlatList
             ref={flatListRef}
             data={messages}
             renderItem={renderMessage}
             keyExtractor={(item) => item.id}
-            className="flex-1"
-            contentContainerStyle={{ paddingBottom: 10 }}
-            onLayout={() => flatListRef.current?.scrollToEnd({ animated: true })}
+            contentContainerClassName="p-4 pb-6"
+            ListHeaderComponent={renderWelcomeMessage}
+            ListFooterComponent={
+              loading && messages.length > 0 ? (
+                <View className="my-3 flex-row items-center self-start rounded-2xl bg-gray-100 px-3 py-1.5">
+                  <ActivityIndicator size="small" color="#4F46E5" />
+                  <Text className="ml-2 text-sm text-gray-600">Thinking...</Text>
+                </View>
+              ) : null
+            }
           />
 
-          <View className="mb-4 flex-row items-center rounded-full border border-gray-300 px-4 py-2">
+          <View className="flex-row border-t border-gray-200 bg-white px-4 py-3">
             <TextInput
-              className="flex-1 text-base"
+              className="max-h-24 flex-1 rounded-full bg-gray-100 px-4 py-2.5 text-base text-gray-800"
+              value={inputText}
+              onChangeText={setInputText}
               placeholder="Type your message..."
-              value={input}
-              onChangeText={setInput}
+              placeholderTextColor="#9CA3AF"
               multiline
+              maxLength={1000}
             />
-            <TouchableOpacity onPress={sendMessage} disabled={!input.trim()}>
-              <FontAwesome name="send" size={20} color={input.trim() ? '#4f46e5' : '#d1d5db'} />
+            <TouchableOpacity
+              className={`ml-2 h-10 w-10 items-center justify-center rounded-full ${
+                !inputText.trim() ? 'bg-gray-200' : 'bg-indigo-600'
+              }`}
+              onPress={handleSend}
+              disabled={!inputText.trim() || loading}>
+              <Ionicons name="send" size={20} color={!inputText.trim() ? '#9CA3AF' : '#FFFFFF'} />
             </TouchableOpacity>
           </View>
-        </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        </>
+      )}
+    </KeyboardAvoidingView>
   );
-}
+};
+
+// Create a new chat session button for the header
+export const NewChatButton = ({ onPress }: { onPress: () => void }) => (
+  <TouchableOpacity
+    className="mr-4 h-8 w-8 items-center justify-center rounded-full bg-indigo-600"
+    onPress={onPress}>
+    <Ionicons name="add" size={24} color="#FFFFFF" />
+  </TouchableOpacity>
+);
+
+export default ChatScreen;
