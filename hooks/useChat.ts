@@ -97,35 +97,57 @@ Feel free to share what's on your mind, and we can explore it together. What rel
         setLoading(true);
         setError(null);
 
+        // Generate a unique message ID to prevent duplicates
+        const tempId = `temp-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
         // Optimistically update UI with user message
         const tempUserMsg: Message = {
-          id: 'temp-' + Date.now(),
+          id: tempId,
           role: 'user',
           content,
           createdAt: new Date(),
         };
 
+        // Update UI with temporary message
         setMessages((prevMessages) => [...prevMessages, tempUserMsg]);
 
+        // Log before API call
+        console.log('Sending message to API:', content);
+
         // Send message and get response
-        const updatedMessages = await sendMessage(currentSession.id, user.id, content);
+        try {
+          const updatedMessages = await sendMessage(currentSession.id, user.id, content);
 
-        setMessages(updatedMessages);
+          console.log('Received response from API, messages count:', updatedMessages.length);
 
-        // Update session in the sessions list
-        const updatedSession = {
-          ...currentSession,
-          messages: updatedMessages,
-          updatedAt: new Date(),
-        };
+          // Replace our temporary version with the real saved messages
+          setMessages(updatedMessages);
 
-        setSessions((prevSessions) =>
-          prevSessions.map((session) =>
-            session.id === currentSession.id ? updatedSession : session
-          )
-        );
+          // Update session in the sessions list
+          const updatedSession = {
+            ...currentSession,
+            messages: updatedMessages,
+            updatedAt: new Date(),
+          };
 
-        setCurrentSession(updatedSession);
+          setSessions((prevSessions) =>
+            prevSessions.map((session) =>
+              session.id === currentSession.id ? updatedSession : session
+            )
+          );
+
+          setCurrentSession(updatedSession);
+        } catch (err) {
+          console.error('Error from sendMessage API call:', err);
+
+          // If API call fails, keep the temporary message but mark it as error
+          setMessages((prevMessages) =>
+            prevMessages.map((msg) =>
+              msg.id === tempId ? { ...msg, content: msg.content + ' (Not sent - Try again)' } : msg
+            )
+          );
+          throw err; // Re-throw to be caught by outer catch
+        }
       } catch (err) {
         console.error('Error sending message:', err);
         setError('Failed to send message. Please try again.');

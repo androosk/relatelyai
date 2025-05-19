@@ -106,6 +106,8 @@ export const sendMessage = async (
   userId: string,
   content: string
 ): Promise<Message[]> => {
+  console.log('ChatService: sendMessage called with sessionId:', sessionId);
+
   // Create user message
   const userMsgId = uuid.v4().toString();
   const now = new Date();
@@ -116,6 +118,8 @@ export const sendMessage = async (
     content,
     createdAt: now,
   };
+
+  console.log('ChatService: Saving user message to database...');
 
   // Save user message to database
   const { error: userMsgError } = await supabase.from('chat_messages').insert([
@@ -129,14 +133,18 @@ export const sendMessage = async (
   ]);
 
   if (userMsgError) {
-    console.error('Error saving user message:', userMsgError);
+    console.error('ChatService: Error saving user message:', userMsgError);
     throw new Error('Failed to save your message');
   }
+
+  console.log('ChatService: User message saved successfully');
 
   // Use your existing database types
   let existingMessages: Tables<'chat_messages'>[] = [];
 
   try {
+    console.log('ChatService: Fetching existing messages...');
+
     // Get existing messages for context
     const { data, error: fetchError } = await supabase
       .from('chat_messages')
@@ -145,11 +153,12 @@ export const sendMessage = async (
       .order('created_at', { ascending: true });
 
     if (fetchError) {
-      console.error('Error fetching message history:', fetchError);
+      console.error('ChatService: Error fetching message history:', fetchError);
       throw new Error('Failed to retrieve message history');
     }
 
     existingMessages = data || [];
+    console.log('ChatService: Fetched', existingMessages.length, 'messages');
 
     const messages: Message[] = existingMessages.map((msg) => ({
       id: msg.id,
@@ -158,51 +167,65 @@ export const sendMessage = async (
       createdAt: safeDate(msg.created_at),
     }));
 
+    console.log('ChatService: Calling Claude API...');
+
     // Get AI response
-    const aiResponse = await getChatResponse(messages);
+    try {
+      const aiResponse = await getChatResponse(messages);
+      console.log('ChatService: Received AI response:', aiResponse.substring(0, 30) + '...');
 
-    // Create assistant message
-    const assistantMsgId = uuid.v4().toString();
-    const assistantMsgTime = new Date();
+      // Create assistant message
+      const assistantMsgId = uuid.v4().toString();
+      const assistantMsgTime = new Date();
 
-    const assistantMessage: Message = {
-      id: assistantMsgId,
-      role: 'assistant',
-      content: aiResponse,
-      createdAt: assistantMsgTime,
-    };
-
-    // Save assistant message to database
-    const { error: aiMsgError } = await supabase.from('chat_messages').insert([
-      {
+      const assistantMessage: Message = {
         id: assistantMsgId,
-        session_id: sessionId,
         role: 'assistant',
         content: aiResponse,
-        created_at: assistantMsgTime.toISOString(),
-      },
-    ]);
+        createdAt: assistantMsgTime,
+      };
 
-    if (aiMsgError) {
-      console.error('Error saving AI response:', aiMsgError);
-      throw new Error('Failed to save AI response');
+      console.log('ChatService: Saving AI response to database...');
+
+      // Save assistant message to database
+      const { error: aiMsgError } = await supabase.from('chat_messages').insert([
+        {
+          id: assistantMsgId,
+          session_id: sessionId,
+          role: 'assistant',
+          content: aiResponse,
+          created_at: assistantMsgTime.toISOString(),
+        },
+      ]);
+
+      if (aiMsgError) {
+        console.error('ChatService: Error saving AI response:', aiMsgError);
+        throw new Error('Failed to save AI response');
+      }
+
+      console.log('ChatService: Updating session timestamp...');
+
+      // Update session 'updated_at' timestamp
+      const { error: updateError } = await supabase
+        .from('chat_sessions')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', sessionId);
+
+      if (updateError) {
+        console.error('ChatService: Error updating session timestamp:', updateError);
+        // Not throwing here as it's not critical
+      }
+
+      console.log('ChatService: Message flow completed successfully');
+
+      // Return updated messages list
+      return [...messages, assistantMessage];
+    } catch (aiError) {
+      console.error('ChatService: Error from AI service:', aiError);
+      throw new Error('Failed to get response from AI: ' + aiError.message);
     }
-
-    // Update session 'updated_at' timestamp
-    const { error: updateError } = await supabase
-      .from('chat_sessions')
-      .update({ updated_at: new Date().toISOString() })
-      .eq('id', sessionId);
-
-    if (updateError) {
-      console.error('Error updating session timestamp:', updateError);
-      // Not throwing here as it's not critical
-    }
-
-    // Return updated messages list
-    return [...messages, assistantMessage];
   } catch (error) {
-    console.error('Error in send message flow:', error);
+    console.error('ChatService: Error in send message flow:', error);
 
     // If AI fails, still keep the user message
     return [
