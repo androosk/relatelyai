@@ -220,9 +220,19 @@ export const sendMessage = async (
 
       // Return updated messages list
       return [...messages, assistantMessage];
-    } catch (aiError) {
+    } catch (aiError: unknown) {
       console.error('ChatService: Error from AI service:', aiError);
-      throw new Error('Failed to get response from AI: ' + aiError.message);
+      let errorMessage = 'Failed to get response from AI';
+      if (aiError instanceof Error) {
+        errorMessage += ': ' + aiError.message;
+      } else if (typeof aiError === 'object' && aiError !== null) {
+        // Try to extract message property if it exists
+        const errorObj = aiError as Record<string, unknown>;
+        if ('message' in errorObj && typeof errorObj.message === 'string') {
+          errorMessage += ': ' + errorObj.message;
+        }
+      }
+      throw new Error(errorMessage);
     }
   } catch (error) {
     console.error('ChatService: Error in send message flow:', error);

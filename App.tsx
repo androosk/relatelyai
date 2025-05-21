@@ -7,7 +7,6 @@ import { ActivityIndicator, View } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 
 // Import screens
-import QuizScreen from './components/screens/QuizScreen';
 import CheckInScreen from './components/screens/CheckInScreen';
 import ChatScreen from './components/screens/ChatScreen';
 import ResourcesScreen from './components/screens/ResourcesScreen';
@@ -15,6 +14,7 @@ import HomeScreen from './components/screens/HomeScreen';
 import ProfileScreen from './components/screens/ProfileScreen';
 import EditProfileScreen from './components/screens/EditProfileScreen';
 import { QuizStackNavigator } from 'components/navigation/QuizStack';
+import { ChatStackNavigator } from 'components/navigation/ChatStack';
 
 // Import auth screens
 import SignInScreen from './components/screens/auth/SignInScreen';
@@ -72,7 +72,7 @@ function MainTabs() {
       <Tab.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
       <Tab.Screen name="Assessment" component={QuizStackNavigator} />
       <Tab.Screen name="Check In" component={CheckInScreen} />
-      <Tab.Screen name="Chat" component={ChatScreen} />
+      <Tab.Screen name="Chat" component={ChatStackNavigator} options={{ headerShown: false }} />
       <Tab.Screen name="Resources" component={ResourcesScreen} />
     </Tab.Navigator>
   );
