@@ -250,7 +250,7 @@ export const sendMessage = async (
   }
 };
 
-export const deleteSession = async (sessionId: string): Promise<void> => {
+export const deleteChatSession = async (sessionId: string): Promise<void> => {
   // Delete the session (messages will cascade delete due to foreign key constraint)
   const { error } = await supabase.from('chat_sessions').delete().eq('id', sessionId);
 
