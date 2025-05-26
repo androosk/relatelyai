@@ -1,7 +1,8 @@
 import { View, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { useChat } from 'hooks/useChat';
+// import { useChat } from 'hooks/useChat';
+import { useChat } from 'components/contexts/ChatContext';
 import { ChatSession } from 'types/chat';
 import { format } from 'date-fns';
 import { ChatHistoryScreenNavigationProp } from 'types/navigation';
@@ -22,9 +23,12 @@ const ChatHistoryScreen = () => {
 
   const handleSelectSession = (session: ChatSession) => {
     console.log('ChatHistory: Selecting session:', session.id);
+    console.log('ChatHistory: Current session before switch:', currentSession?.id);
 
     // Switch to the selected session
     const switched = switchToSession(session.id);
+
+    console.log('ChatHistory: switchToSession returned:', switched);
 
     if (switched) {
       console.log('ChatHistory: Session switched successfully, navigating back');
@@ -32,6 +36,7 @@ const ChatHistoryScreen = () => {
       navigation.navigate('ChatMain');
     } else {
       console.log('ChatHistory: Failed to switch session');
+      // Optionally show an error message to the user
     }
   };
 

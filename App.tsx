@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ActivityIndicator, View } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import { ChatProvider } from 'components/contexts/ChatContext';
 
 // Import screens
 import CheckInScreen from './components/screens/CheckInScreen';
@@ -113,7 +114,9 @@ export default function App() {
     <NavigationContainer>
       <SafeAreaProvider>
         <AuthProvider>
-          <RootNavigator />
+          <ChatProvider>
+            <RootNavigator />
+          </ChatProvider>
         </AuthProvider>
       </SafeAreaProvider>
     </NavigationContainer>

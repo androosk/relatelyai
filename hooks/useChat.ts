@@ -34,6 +34,30 @@ Feel free to share what's on your mind, and we can explore it together. What rel
   };
 
   // Fetch chat sessions for current user
+  // useEffect(() => {
+  //   if (!user) return;
+
+  //   const fetchSessions = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const userSessions = await getChatSessions(user.id);
+  //       setSessions(userSessions);
+
+  //       // Set current session to the most recent one if available
+  //       if (userSessions.length > 0) {
+  //         setCurrentSession(userSessions[0]);
+  //         setMessages(userSessions[0].messages);
+  //       }
+  //     } catch (err) {
+  //       console.error('Error fetching chat sessions:', err);
+  //       setError('Failed to load chat history');
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchSessions();
+  // }, [user]);
   useEffect(() => {
     if (!user) return;
 
@@ -43,10 +67,33 @@ Feel free to share what's on your mind, and we can explore it together. What rel
         const userSessions = await getChatSessions(user.id);
         setSessions(userSessions);
 
-        // Set current session to the most recent one if available
-        if (userSessions.length > 0) {
+        // Only set current session to the most recent one if there's no current session
+        // This prevents overriding a manually selected session
+        if (userSessions.length > 0 && !currentSession) {
+          console.log('useChat: No current session, setting to most recent:', userSessions[0].id);
           setCurrentSession(userSessions[0]);
           setMessages(userSessions[0].messages);
+        } else if (currentSession) {
+          // If we have a current session, make sure it's still in the updated sessions list
+          const updatedCurrentSession = userSessions.find((s) => s.id === currentSession.id);
+          if (updatedCurrentSession) {
+            console.log(
+              'useChat: Updating current session with fresh data:',
+              updatedCurrentSession.id
+            );
+            setCurrentSession(updatedCurrentSession);
+            setMessages(updatedCurrentSession.messages);
+          } else {
+            console.log('useChat: Current session no longer exists, setting to most recent');
+            // Current session was deleted, fall back to most recent
+            if (userSessions.length > 0) {
+              setCurrentSession(userSessions[0]);
+              setMessages(userSessions[0].messages);
+            } else {
+              setCurrentSession(null);
+              setMessages([]);
+            }
+          }
         }
       } catch (err) {
         console.error('Error fetching chat sessions:', err);
@@ -177,9 +224,28 @@ Feel free to share what's on your mind, and we can explore it together. What rel
   // Switch to a session and optionally return it for navigation purposes
   const switchToSession = useCallback(
     (sessionId: string) => {
-      return switchSession(sessionId);
+      console.log('useChat: switchToSession called with:', sessionId);
+      console.log('useChat: Current session before switch:', currentSession?.id);
+      console.log(
+        'useChat: Available sessions:',
+        sessions.map((s) => s.id)
+      );
+
+      const session = sessions.find((s) => s.id === sessionId);
+      if (session) {
+        console.log('useChat: Found session, switching to:', session.id);
+        setCurrentSession(session);
+        setMessages(session.messages);
+        setError(null);
+
+        console.log('useChat: Session switch completed successfully');
+        return true;
+      } else {
+        console.log('useChat: Session not found:', sessionId);
+        return false;
+      }
     },
-    [switchSession]
+    [sessions, currentSession]
   );
 
   // Delete a chat session
