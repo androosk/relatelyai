@@ -6,25 +6,17 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ActivityIndicator, View } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { ChatProvider } from 'components/contexts/ChatContext';
-
-// Import screens
 import CheckInScreen from './components/screens/CheckInScreen';
-import ChatScreen from './components/screens/ChatScreen';
 import ResourcesScreen from './components/screens/ResourcesScreen';
 import HomeScreen from './components/screens/HomeScreen';
 import ProfileScreen from './components/screens/ProfileScreen';
 import EditProfileScreen from './components/screens/EditProfileScreen';
 import { QuizStackNavigator } from 'components/navigation/QuizStack';
 import { ChatStackNavigator } from 'components/navigation/ChatStack';
-
-// Import auth screens
 import SignInScreen from './components/screens/auth/SignInScreen';
 import SignUpScreen from './components/screens/auth/SignUpScreen';
-
-// Import auth context
 import { AuthProvider, useAuth } from './components/contexts/AuthContext';
 
-// Define types for navigation
 export type RootStackParamList = {
   App: undefined;
   SignIn: undefined;
@@ -42,11 +34,9 @@ export type MainTabParamList = {
   Profile: undefined;
 };
 
-// Set up navigators
 const Tab = createBottomTabNavigator<MainTabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-// Main tabs navigator (shown when user is authenticated)
 function MainTabs() {
   return (
     <Tab.Navigator
@@ -108,7 +98,6 @@ const RootNavigator = () => {
   );
 };
 
-// Main App component
 export default function App() {
   return (
     <NavigationContainer>

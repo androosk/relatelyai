@@ -1,21 +1,4 @@
 import { supabase } from 'api/supabase';
-
-// Define the type for Supabase user
-interface SupabaseUser {
-  id: string;
-  [key: string]: any;
-}
-
-// Define the Supabase response type
-interface SupabaseResponse<T> {
-  data: T | null;
-  error: {
-    code?: string;
-    message: string;
-    [key: string]: any;
-  } | null;
-}
-
 export interface Profile {
   id: string;
   updated_at: Date;
@@ -45,7 +28,6 @@ interface ProfileUpdates {
 }
 
 export const profileService = {
-  // Get current user's profile
   async getProfile(): Promise<Profile> {
     const {
       data: { user },
@@ -57,11 +39,9 @@ export const profileService = {
 
     if (error) throw error;
 
-    // Use type assertion with unknown first to avoid unsafe casting
     return data as unknown as Profile;
   },
 
-  // Update current user's profile
   async updateProfile(updates: ProfileUpdates): Promise<Profile> {
     const {
       data: { user },
@@ -80,7 +60,6 @@ export const profileService = {
 
     if (error) throw error;
 
-    // Handle array or single result properly
     return (Array.isArray(data) ? data[0] : data) as unknown as Profile;
   },
 };

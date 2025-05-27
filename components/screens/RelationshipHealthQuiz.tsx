@@ -86,8 +86,7 @@ const RelationshipHealthQuiz: React.FC = () => {
       score,
       assessment: assessmentText,
       answers,
-      // Add missing required fields based on your type definition
-      quiz_type: 'relationship', // Default quiz type
+      quiz_type: 'relationship',
     });
 
     if (error) {

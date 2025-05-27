@@ -1,6 +1,4 @@
-// Create a new file: contexts/ChatContext.tsx
-
-import React, { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, ReactNode } from 'react';
 import { Message, ChatSession } from '../../types/chat';
 import { useChat as useInternalChat } from '../../hooks/useChat';
 

@@ -3,7 +3,7 @@ export interface Checkin {
   id: string;
   user_id: string;
   mood_score: number;
-  created_at: string | null; // Changed to allow null
+  created_at: string | null;
   notes?: string | null;
   tags?: string[] | null;
 }
@@ -19,24 +19,7 @@ interface MoodDataPoint {
   average: number;
 }
 
-// Define the type for Supabase user
-interface SupabaseUser {
-  id: string;
-  [key: string]: any;
-}
-
-// Define the Supabase response type
-interface SupabaseResponse<T> {
-  data: T | null;
-  error: {
-    code?: string;
-    message: string;
-    [key: string]: any;
-  } | null;
-}
-
 export const checkinService = {
-  // Create a new check-in
   async createCheckin(moodScore: number, notes: string, tags: string[] = []): Promise<Checkin> {
     const {
       data: { user },
@@ -63,7 +46,6 @@ export const checkinService = {
     return data[0] as unknown as Checkin;
   },
 
-  // Get check-in history
   async getCheckinHistory(limit: number = 30, page: number = 0): Promise<Checkin[]> {
     const {
       data: { user },
@@ -84,7 +66,6 @@ export const checkinService = {
     return (data || []) as unknown as Checkin[];
   },
 
-  // Get check-in analytics (average mood over time periods)
   async getCheckinAnalytics(
     timeframe: '7days' | '30days' | '90days' = '30days'
   ): Promise<MoodDataPoint[]> {
@@ -119,8 +100,6 @@ export const checkinService = {
       .order('created_at', { ascending: true });
 
     if (error) throw error;
-
-    // Process the data to get average mood scores by day/week
     interface MoodAccumulator {
       [key: string]: {
         count: number;
@@ -145,7 +124,6 @@ export const checkinService = {
       return acc;
     }, {} as MoodAccumulator);
 
-    // Calculate averages and format for visualization
     const formattedData: MoodDataPoint[] = Object.keys(moodData).map((day) => ({
       date: day,
       average: moodData[day].total / moodData[day].count,
@@ -154,7 +132,6 @@ export const checkinService = {
     return formattedData;
   },
 
-  // Update a check-in
   async updateCheckin(id: string, updates: CheckinUpdates): Promise<Checkin> {
     const {
       data: { user },
@@ -166,7 +143,7 @@ export const checkinService = {
       .from('checkins')
       .update(updates)
       .eq('id', id)
-      .eq('user_id', user.id) // Make sure the user owns this check-in
+      .eq('user_id', user.id)
       .select();
 
     if (error) throw error;
@@ -178,7 +155,6 @@ export const checkinService = {
     return data[0] as unknown as Checkin;
   },
 
-  // Delete a check-in
   async deleteCheckin(id: string): Promise<boolean> {
     const {
       data: { user },
@@ -186,7 +162,7 @@ export const checkinService = {
 
     if (!user) throw new Error('User not found');
 
-    const { error } = await supabase.from('checkins').delete().eq('id', id).eq('user_id', user.id); // Make sure the user owns this check-in
+    const { error } = await supabase.from('checkins').delete().eq('id', id).eq('user_id', user.id);
 
     if (error) throw error;
 

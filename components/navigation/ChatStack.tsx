@@ -3,7 +3,6 @@ import ChatScreen, { NewChatButton } from '../screens/ChatScreen';
 import ChatHistoryScreen from '../screens/ChatHistoryScreen';
 import { useChat } from '../../hooks/useChat';
 
-// Define the chat stack param list
 export type ChatStackParamList = {
   ChatMain: undefined;
   ChatHistory: undefined;
@@ -24,9 +23,7 @@ export const ChatStackNavigator = () => {
           headerRight: () => (
             <NewChatButton
               onPress={() => {
-                startNewChat().then(() => {
-                  // Focus stays on the chat screen, but with a new session
-                });
+                startNewChat().then(() => {});
               }}
             />
           ),

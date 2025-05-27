@@ -1,5 +1,3 @@
-// navigation/QuizStack.tsx
-import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import QuizScreen from 'components/screens/QuizScreen';
 import RelationshipHealthQuiz from 'components/screens/RelationshipHealthQuiz';

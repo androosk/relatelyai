@@ -1,15 +1,13 @@
-import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
+import { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 import { User, Session, AuthChangeEvent, AuthError } from '@supabase/supabase-js';
 import { supabase } from 'api/supabase';
 
-// Define the shape of our Auth context
 interface AuthContextValue {
   user: User | null;
   loading: boolean;
   signOut: () => Promise<void>;
 }
 
-// Create context with default values
 const AuthContext = createContext<AuthContextValue>({
   user: null,
   loading: true,
@@ -25,15 +23,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Check for the current user session when the app loads
     const checkUser = async (): Promise<void> => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+
         if (error) {
           throw error;
         }
-        
+
         setUser(session?.user ?? null);
       } catch (error) {
         const authError = error as AuthError;
@@ -45,7 +45,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     checkUser();
 
-    // Set up an auth state listener
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event: AuthChangeEvent, session: Session | null) => {
         setUser(session?.user ?? null);
@@ -53,7 +52,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     );
 
-    // Clean up the subscription
     return () => {
       if (authListener && authListener.subscription) {
         authListener.subscription.unsubscribe();
@@ -61,7 +59,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
   }, []);
 
-  // Sign out
   const signOut = async (): Promise<void> => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -72,7 +69,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Auth context value
   const value: AuthContextValue = {
     user,
     loading,
@@ -82,16 +78,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Custom hook to use the auth context
 export const useAuth = (): AuthContextValue => {
   const context = useContext(AuthContext);
-  
+
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
-  
+
   return context;
 };
 
-// Export the context as well
 export { AuthContext };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { profileService, Profile } from 'components/services/profileService';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -40,7 +40,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   async function handleLogout(): Promise<void> {
     try {
       await signOut();
-      // Navigation will be handled by the auth context listener
     } catch (error) {
       console.error('Error logging out:', error);
       Alert.alert('Error', 'Failed to log out');
@@ -59,13 +58,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     <View className="flex-1 bg-gray-50 p-6">
       <View className="rounded-xl bg-white p-6 shadow-sm">
         <Text className="mb-6 text-center text-2xl font-bold text-gray-800">Your Profile</Text>
-
-        {/* <View className="mb-4">
-          <Text className="mb-1 text-sm font-medium text-gray-500">Username</Text>
-          <Text className="text-lg font-medium text-gray-800">
-            {userProfile?.username || 'Not set'}
-          </Text>
-        </View> */}
 
         <View className="mb-4">
           <Text className="mb-1 text-sm font-medium text-gray-500">First Name</Text>

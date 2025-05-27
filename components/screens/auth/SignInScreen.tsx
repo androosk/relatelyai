@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { supabase } from 'api/supabase';
@@ -29,12 +29,9 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
         email,
         password,
       });
-
       if (error) throw error;
 
-      // Sign in successful
       console.log('User signed in:', data);
-      // Navigation will be handled by the auth state listener
     } catch (error: any) {
       Alert.alert('Error signing in', error.message);
     } finally {

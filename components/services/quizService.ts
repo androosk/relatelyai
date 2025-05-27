@@ -1,24 +1,9 @@
 import { supabase } from 'api/supabase';
-
-// Re-use these types from profileService.ts in a real app, but define here for completeness
-interface SupabaseUser {
-  id: string;
-  [key: string]: any;
-}
 export interface Question {
   id: number;
   question: string;
   options: string[];
 }
-interface SupabaseResponse<T> {
-  data: T | null;
-  error: {
-    code?: string;
-    message: string;
-    [key: string]: any;
-  } | null;
-}
-
 interface QuizResult {
   id: string;
   user_id: string;
@@ -27,11 +12,10 @@ interface QuizResult {
   recommendation: string;
   answers: Record<string, any>;
   created_at: string;
-  [key: string]: any; // Additional quiz fields
+  [key: string]: any;
 }
 
 export const quizService = {
-  // Save quiz results
   async saveQuizResult(
     score: number,
     assessment: string,
@@ -66,7 +50,6 @@ export const quizService = {
     return data[0] as unknown as QuizResult;
   },
 
-  // Get quiz history
   async getQuizHistory(): Promise<QuizResult[]> {
     const {
       data: { user },
@@ -85,7 +68,6 @@ export const quizService = {
     return (data || []) as unknown as QuizResult[];
   },
 
-  // Get latest quiz result
   async getLatestQuizResult(): Promise<QuizResult | null> {
     const {
       data: { user },
@@ -102,7 +84,6 @@ export const quizService = {
       .single();
 
     if (error && error.code !== 'PGRST116') {
-      // PGRST116 means no rows returned, which is fine
       throw error;
     }
     console.log('Latest quiz result:', data);

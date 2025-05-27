@@ -4,7 +4,6 @@ import { Message, ChatSession } from '../../types/chat';
 import { getChatResponse } from './aiService';
 import { Tables } from 'api/database.types'; // Import your database types
 
-// Helper function to safely create Date objects
 const safeDate = (dateString: string | null): Date => {
   return dateString ? new Date(dateString) : new Date();
 };
@@ -39,7 +38,6 @@ export const createNewChatSession = async (userId: string): Promise<ChatSession>
 };
 
 export const getChatSessions = async (userId: string): Promise<ChatSession[]> => {
-  // First get all chat sessions
   const { data: sessionsData, error: sessionsError } = await supabase
     .from('chat_sessions')
     .select('id, user_id, created_at, updated_at')
@@ -55,7 +53,6 @@ export const getChatSessions = async (userId: string): Promise<ChatSession[]> =>
     return [];
   }
 
-  // Then get all messages for these sessions
   const sessionIds = sessionsData.map((session) => session.id);
 
   const { data: messagesData, error: messagesError } = await supabase
@@ -69,10 +66,8 @@ export const getChatSessions = async (userId: string): Promise<ChatSession[]> =>
     throw new Error('Failed to fetch chat messages');
   }
 
-  // Organize messages by session
   const messagesBySession: Record<string, Message[]> = {};
 
-  // Use your database types
   const typedMessagesData = (messagesData as Tables<'chat_messages'>[]) || [];
 
   typedMessagesData.forEach((msg) => {
@@ -88,8 +83,6 @@ export const getChatSessions = async (userId: string): Promise<ChatSession[]> =>
     });
   });
 
-  // Combine sessions with their messages
-  // Use your database types
   const typedSessionsData = sessionsData as Tables<'chat_sessions'>[];
 
   return typedSessionsData.map((session) => ({
@@ -108,7 +101,6 @@ export const sendMessage = async (
 ): Promise<Message[]> => {
   console.log('ChatService: sendMessage called with sessionId:', sessionId);
 
-  // Create user message
   const userMsgId = uuid.v4().toString();
   const now = new Date();
 
@@ -121,7 +113,6 @@ export const sendMessage = async (
 
   console.log('ChatService: Saving user message to database...');
 
-  // Save user message to database
   const { error: userMsgError } = await supabase.from('chat_messages').insert([
     {
       id: userMsgId,
@@ -139,13 +130,11 @@ export const sendMessage = async (
 
   console.log('ChatService: User message saved successfully');
 
-  // Use your existing database types
   let existingMessages: Tables<'chat_messages'>[] = [];
 
   try {
     console.log('ChatService: Fetching existing messages...');
 
-    // Get existing messages for context
     const { data, error: fetchError } = await supabase
       .from('chat_messages')
       .select('id, session_id, role, content, created_at')
@@ -169,12 +158,10 @@ export const sendMessage = async (
 
     console.log('ChatService: Calling Claude API...');
 
-    // Get AI response
     try {
       const aiResponse = await getChatResponse(messages);
       console.log('ChatService: Received AI response:', aiResponse.substring(0, 30) + '...');
 
-      // Create assistant message
       const assistantMsgId = uuid.v4().toString();
       const assistantMsgTime = new Date();
 
@@ -187,7 +174,6 @@ export const sendMessage = async (
 
       console.log('ChatService: Saving AI response to database...');
 
-      // Save assistant message to database
       const { error: aiMsgError } = await supabase.from('chat_messages').insert([
         {
           id: assistantMsgId,
@@ -205,7 +191,6 @@ export const sendMessage = async (
 
       console.log('ChatService: Updating session timestamp...');
 
-      // Update session 'updated_at' timestamp
       const { error: updateError } = await supabase
         .from('chat_sessions')
         .update({ updated_at: new Date().toISOString() })
@@ -213,12 +198,10 @@ export const sendMessage = async (
 
       if (updateError) {
         console.error('ChatService: Error updating session timestamp:', updateError);
-        // Not throwing here as it's not critical
       }
 
       console.log('ChatService: Message flow completed successfully');
 
-      // Return updated messages list
       return [...messages, assistantMessage];
     } catch (aiError: unknown) {
       console.error('ChatService: Error from AI service:', aiError);
@@ -226,7 +209,6 @@ export const sendMessage = async (
       if (aiError instanceof Error) {
         errorMessage += ': ' + aiError.message;
       } else if (typeof aiError === 'object' && aiError !== null) {
-        // Try to extract message property if it exists
         const errorObj = aiError as Record<string, unknown>;
         if ('message' in errorObj && typeof errorObj.message === 'string') {
           errorMessage += ': ' + errorObj.message;
@@ -237,7 +219,6 @@ export const sendMessage = async (
   } catch (error) {
     console.error('ChatService: Error in send message flow:', error);
 
-    // If AI fails, still keep the user message
     return [
       ...existingMessages.map((msg) => ({
         id: msg.id,
@@ -251,7 +232,6 @@ export const sendMessage = async (
 };
 
 export const deleteChatSession = async (sessionId: string): Promise<void> => {
-  // Delete the session (messages will cascade delete due to foreign key constraint)
   const { error } = await supabase.from('chat_sessions').delete().eq('id', sessionId);
 
   if (error) {

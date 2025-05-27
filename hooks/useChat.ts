@@ -16,7 +16,6 @@ export const useChat = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Welcome message for new chats
   const WELCOME_MESSAGE: Message = {
     id: 'welcome',
     role: 'assistant',
@@ -33,31 +32,6 @@ Feel free to share what's on your mind, and we can explore it together. What rel
     createdAt: new Date(),
   };
 
-  // Fetch chat sessions for current user
-  // useEffect(() => {
-  //   if (!user) return;
-
-  //   const fetchSessions = async () => {
-  //     try {
-  //       setLoading(true);
-  //       const userSessions = await getChatSessions(user.id);
-  //       setSessions(userSessions);
-
-  //       // Set current session to the most recent one if available
-  //       if (userSessions.length > 0) {
-  //         setCurrentSession(userSessions[0]);
-  //         setMessages(userSessions[0].messages);
-  //       }
-  //     } catch (err) {
-  //       console.error('Error fetching chat sessions:', err);
-  //       setError('Failed to load chat history');
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchSessions();
-  // }, [user]);
   useEffect(() => {
     if (!user) return;
 
@@ -67,14 +41,11 @@ Feel free to share what's on your mind, and we can explore it together. What rel
         const userSessions = await getChatSessions(user.id);
         setSessions(userSessions);
 
-        // Only set current session to the most recent one if there's no current session
-        // This prevents overriding a manually selected session
         if (userSessions.length > 0 && !currentSession) {
           console.log('useChat: No current session, setting to most recent:', userSessions[0].id);
           setCurrentSession(userSessions[0]);
           setMessages(userSessions[0].messages);
         } else if (currentSession) {
-          // If we have a current session, make sure it's still in the updated sessions list
           const updatedCurrentSession = userSessions.find((s) => s.id === currentSession.id);
           if (updatedCurrentSession) {
             console.log(
@@ -85,7 +56,6 @@ Feel free to share what's on your mind, and we can explore it together. What rel
             setMessages(updatedCurrentSession.messages);
           } else {
             console.log('useChat: Current session no longer exists, setting to most recent');
-            // Current session was deleted, fall back to most recent
             if (userSessions.length > 0) {
               setCurrentSession(userSessions[0]);
               setMessages(userSessions[0].messages);
@@ -106,7 +76,6 @@ Feel free to share what's on your mind, and we can explore it together. What rel
     fetchSessions();
   }, [user]);
 
-  // Create a new chat session
   const startNewChat = useCallback(async () => {
     if (!user) return null;
 
@@ -116,7 +85,6 @@ Feel free to share what's on your mind, and we can explore it together. What rel
 
       const newSession = await createNewChatSession(user.id);
 
-      // Add the welcome message
       const updatedSession = {
         ...newSession,
         messages: [WELCOME_MESSAGE],
@@ -136,7 +104,6 @@ Feel free to share what's on your mind, and we can explore it together. What rel
     }
   }, [user]);
 
-  // Send a message in the current session
   const sendUserMessage = useCallback(
     async (content: string) => {
       if (!user || !currentSession) return;
@@ -144,11 +111,7 @@ Feel free to share what's on your mind, and we can explore it together. What rel
       try {
         setLoading(true);
         setError(null);
-
-        // Generate a unique message ID to prevent duplicates
         const tempId = `temp-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-
-        // Optimistically update UI with user message
         const tempUserMsg: Message = {
           id: tempId,
           role: 'user',
@@ -156,22 +119,15 @@ Feel free to share what's on your mind, and we can explore it together. What rel
           createdAt: new Date(),
         };
 
-        // Update UI with temporary message
         setMessages((prevMessages) => [...prevMessages, tempUserMsg]);
-
-        // Log before API call
         console.log('Sending message to API:', content);
 
-        // Send message and get response
         try {
           const updatedMessages = await sendMessage(currentSession.id, user.id, content);
 
           console.log('Received response from API, messages count:', updatedMessages.length);
 
-          // Replace our temporary version with the real saved messages
           setMessages(updatedMessages);
-
-          // Update session in the sessions list
           const updatedSession = {
             ...currentSession,
             messages: updatedMessages,
@@ -188,13 +144,12 @@ Feel free to share what's on your mind, and we can explore it together. What rel
         } catch (err) {
           console.error('Error from sendMessage API call:', err);
 
-          // If API call fails, keep the temporary message but mark it as error
           setMessages((prevMessages) =>
             prevMessages.map((msg) =>
               msg.id === tempId ? { ...msg, content: msg.content + ' (Not sent - Try again)' } : msg
             )
           );
-          throw err; // Re-throw to be caught by outer catch
+          throw err;
         }
       } catch (err) {
         console.error('Error sending message:', err);
@@ -206,7 +161,6 @@ Feel free to share what's on your mind, and we can explore it together. What rel
     [user, currentSession]
   );
 
-  // Switch to a different chat session
   const switchSession = useCallback(
     (sessionId: string) => {
       const session = sessions.find((s) => s.id === sessionId);
@@ -221,7 +175,6 @@ Feel free to share what's on your mind, and we can explore it together. What rel
     [sessions]
   );
 
-  // Switch to a session and optionally return it for navigation purposes
   const switchToSession = useCallback(
     (sessionId: string) => {
       console.log('useChat: switchToSession called with:', sessionId);
@@ -248,20 +201,15 @@ Feel free to share what's on your mind, and we can explore it together. What rel
     [sessions, currentSession]
   );
 
-  // Delete a chat session
   const deleteSession = useCallback(
     async (sessionId: string) => {
       if (!user) return;
 
       try {
         setLoading(true);
-
         await deleteChatSession(sessionId);
-
-        // Update local state
         setSessions((prevSessions) => prevSessions.filter((s) => s.id !== sessionId));
 
-        // If the deleted session was the current one, switch to another one
         if (currentSession?.id === sessionId) {
           const remainingSessions = sessions.filter((s) => s.id !== sessionId);
           if (remainingSessions.length > 0) {
@@ -291,7 +239,7 @@ Feel free to share what's on your mind, and we can explore it together. What rel
     startNewChat,
     sendUserMessage,
     switchSession,
-    switchToSession, // Add this for explicit navigation use
+    switchToSession,
     deleteSession,
   };
 };

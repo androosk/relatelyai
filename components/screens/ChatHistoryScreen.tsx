@@ -1,19 +1,17 @@
 import { View, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-// import { useChat } from 'hooks/useChat';
 import { useChat } from 'components/contexts/ChatContext';
 import { ChatSession } from 'types/chat';
 import { format } from 'date-fns';
 import { ChatHistoryScreenNavigationProp } from 'types/navigation';
 
-// Helper function for safe date formatting
 const safeFormat = (date: Date, formatString: string): string => {
   try {
     return format(date, formatString);
   } catch (error) {
     console.warn('Error formatting date:', error);
-    return 'Recently'; // Fallback string
+    return 'Recently';
   }
 };
 
@@ -25,18 +23,15 @@ const ChatHistoryScreen = () => {
     console.log('ChatHistory: Selecting session:', session.id);
     console.log('ChatHistory: Current session before switch:', currentSession?.id);
 
-    // Switch to the selected session
     const switched = switchToSession(session.id);
 
     console.log('ChatHistory: switchToSession returned:', switched);
 
     if (switched) {
       console.log('ChatHistory: Session switched successfully, navigating back');
-      // Navigate back to the chat screen
       navigation.navigate('ChatMain');
     } else {
       console.log('ChatHistory: Failed to switch session');
-      // Optionally show an error message to the user
     }
   };
 
@@ -63,7 +58,6 @@ const ChatHistoryScreen = () => {
       return 'New conversation';
     }
 
-    // Find the first user message (skip welcome messages)
     const firstUserMessage = session.messages.find((msg) => msg.role === 'user');
     if (firstUserMessage) {
       return firstUserMessage.content.length > 50

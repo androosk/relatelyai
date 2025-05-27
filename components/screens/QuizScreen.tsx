@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -20,15 +20,11 @@ const QuizScreen: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Add a listener for when the screen comes into focus
     const unsubscribe = navigation.addListener('focus', () => {
       fetchQuizResults();
     });
-
-    // Initial fetch
     fetchQuizResults();
 
-    // Cleanup
     return unsubscribe;
   }, [navigation]);
 

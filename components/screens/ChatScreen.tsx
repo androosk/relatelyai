@@ -10,20 +10,18 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-// import { useChat } from 'hooks/useChat';
 import { useChat } from 'components/contexts/ChatContext';
 import { Message } from 'types/chat';
 import { format } from 'date-fns';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { ChatScreenNavigationProp } from 'types/navigation';
 
-// Helper function for safe date formatting
 const safeFormat = (date: Date, formatString: string): string => {
   try {
     return format(date, formatString);
   } catch (error) {
     console.warn('Error formatting date:', error);
-    return 'Just now'; // Fallback string
+    return 'Just now';
   }
 };
 
@@ -43,7 +41,6 @@ const ChatScreen = () => {
           onPress={() => {
             startNewChat()
               .then(() => {
-                // Focus stays on the chat screen, but with a new session
                 console.log('New chat started from header button');
               })
               .catch((error) => {
@@ -56,7 +53,6 @@ const ChatScreen = () => {
     });
   }, [navigation, startNewChat]);
 
-  // Auto-scroll to bottom when messages change
   useEffect(() => {
     if (messages.length > 0 && flatListRef.current) {
       setTimeout(() => {
@@ -65,7 +61,6 @@ const ChatScreen = () => {
     }
   }, [messages]);
 
-  // Just log the current state when screen comes into focus - no automatic session creation
   useFocusEffect(
     React.useCallback(() => {
       console.log(
@@ -91,20 +86,16 @@ const ChatScreen = () => {
     const messageText = inputText.trim();
     setInputText('');
 
-    // If there's no current session, create one first
     if (!currentSession) {
       console.log('ChatScreen: No current session, creating new session before sending message');
       try {
         await startNewChat();
-        // After creating the session, send the message
         sendUserMessage(messageText);
       } catch (error) {
         console.error('ChatScreen: Failed to create new session:', error);
-        // Restore the input text if session creation failed
         setInputText(messageText);
       }
     } else {
-      // Send message to existing session
       sendUserMessage(messageText);
     }
   };
@@ -134,7 +125,6 @@ const ChatScreen = () => {
   };
 
   const renderWelcomeMessage = () => {
-    // Show welcome message when there's no current session or no messages
     if (currentSession && messages.length > 0) return null;
 
     return (
@@ -153,7 +143,6 @@ const ChatScreen = () => {
     );
   };
 
-  // Show error state
   if (error) {
     return (
       <KeyboardAvoidingView
@@ -174,7 +163,6 @@ const ChatScreen = () => {
             onPress={() => {
               if (currentSession) {
                 // Try to refresh current session or clear error
-                // You might want to add a method to your useChat hook for this
               } else {
                 startNewChat();
               }
@@ -244,7 +232,6 @@ const ChatScreen = () => {
   );
 };
 
-// Create a new chat session button for the header
 export const NewChatButton = ({ onPress }: { onPress: () => void }) => (
   <TouchableOpacity
     className="mr-4 h-8 w-8 items-center justify-center rounded-full bg-indigo-600"

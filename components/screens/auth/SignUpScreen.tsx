@@ -39,13 +39,11 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
       if (error) throw error;
 
       if (data.session === null) {
-        // User needs to confirm their email
         Alert.alert(
           'Check your email',
           'We sent you a confirmation email. Please check your email to complete your registration.'
         );
       }
-      // Otherwise navigation will be handled by the auth state listener
     } catch (error: any) {
       Alert.alert('Error signing up', error.message);
     } finally {

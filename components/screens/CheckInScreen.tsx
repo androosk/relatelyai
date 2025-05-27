@@ -44,11 +44,7 @@ export default function CheckInScreen() {
       setSaving(true);
       setError(null);
 
-      await checkinService.createCheckin(
-        currentEmotion,
-        notes.trim(),
-        [] // Empty tags array for now, could be added as a feature later
-      );
+      await checkinService.createCheckin(currentEmotion, notes.trim(), []);
 
       setNotes('');
       await loadCheckIns();
@@ -77,7 +73,6 @@ export default function CheckInScreen() {
   const handleDeleteCheckin = async (id: string) => {
     try {
       await checkinService.deleteCheckin(id);
-      // Filter out the deleted check-in
       setCheckIns(checkIns.filter((checkin) => checkin.id !== id));
     } catch (err) {
       console.error('Failed to delete check-in:', err);

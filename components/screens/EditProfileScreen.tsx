@@ -231,22 +231,6 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ navigation }) => 
               Relationship Information
             </Text>
 
-            {/* <View className="mb-4">
-              <Text className="mb-2 text-sm font-medium text-gray-500">Relationship Status</Text>
-              <View className="overflow-hidden rounded-lg border border-gray-300">
-                <Picker
-                  selectedValue={relationshipStatus}
-                  onValueChange={(value) => setRelationshipStatus(value)}
-                  className="h-12">
-                  <Picker.Item label="Select status" value="" />
-                  <Picker.Item label="Single" value="Single" />
-                  <Picker.Item label="Dating" value="Dating" />
-                  <Picker.Item label="Engaged" value="Engaged" />
-                  <Picker.Item label="Married" value="Married" />
-                  <Picker.Item label="It's complicated" value="Complicated" />
-                </Picker>
-              </View>
-            </View> */}
             <StatusDropdown value={relationshipStatus} setValue={setRelationshipStatus} />
 
             {relationshipStatus !== 'Single' && relationshipStatus !== '' && (

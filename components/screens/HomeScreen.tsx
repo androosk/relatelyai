@@ -32,7 +32,6 @@ type HomeScreenNavigationProp = CompositeNavigationProp<
   NativeStackNavigationProp<StackParamList>
 >;
 
-// Relationship tips
 const relationshipTips = [
   'Schedule a weekly date night to maintain connection',
   'Practice active listening without interrupting',
@@ -44,8 +43,6 @@ const HomeScreen = () => {
   const [currentTip, setCurrentTip] = useState(0);
   const [isDark, setIsDark] = useState(Appearance.getColorScheme() === 'dark');
   const navigation = useNavigation<HomeScreenNavigationProp>();
-
-  // User data states
   const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(true);
   const [checkins, setCheckins] = useState<Checkin[]>([]);
@@ -56,12 +53,9 @@ const HomeScreen = () => {
   const [hasEnoughData, setHasEnoughData] = useState(false);
 
   useEffect(() => {
-    // Set up the listener for theme changes
     const subscription = Appearance.addChangeListener(({ colorScheme }) => {
       setIsDark(colorScheme === 'dark');
     });
-
-    // Load user data
     loadUserData();
 
     return () => subscription.remove();
@@ -76,7 +70,6 @@ const HomeScreen = () => {
       const lastQuizScore = await quizService.getLatestQuizResult();
       setQuizScore(lastQuizScore?.score || 0);
 
-      // Get check-in history (larger limit to ensure we have enough data for calculations)
       const checkinsData = await checkinService.getCheckinHistory(100);
       console.log('Check-ins:', checkinsData);
       setCheckins(checkinsData);
@@ -94,12 +87,10 @@ const HomeScreen = () => {
       return;
     }
 
-    // Sort by date, newest first
     const sortedCheckins = [...checkinsData].sort((a, b) => {
       return new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime();
     });
 
-    // Set the last check-in time
     const lastCheckinDate = new Date(sortedCheckins[0]?.created_at || '');
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - lastCheckinDate.getTime());
@@ -157,13 +148,10 @@ const HomeScreen = () => {
       return;
     }
 
-    // Count consecutive days backwards
     let streak = 1;
     for (let i = sortedByOldest.length - 1; i > 0; i--) {
       const currentDate = new Date(sortedByOldest[i].date);
       const prevDate = new Date(sortedByOldest[i - 1].date);
-
-      // Check if dates are consecutive
       const timeDiff = currentDate.getTime() - prevDate.getTime();
       const daysDiff = timeDiff / (1000 * 3600 * 24);
 
@@ -189,7 +177,6 @@ const HomeScreen = () => {
     border: isDark ? 'border-gray-800' : 'border-gray-300',
   };
 
-  // Calculate mood display values
   const getMoodText = (score: number) => {
     if (score >= 4.5) return 'Excellent';
     if (score >= 3.5) return 'Good';
@@ -236,18 +223,13 @@ const HomeScreen = () => {
         <ScrollView className="flex-1">
           <Text className={`text-2xl font-bold ${colors.textPrimary} px-4 py-3`}>Today</Text>
 
-          {/* Relationship Mood Card */}
           <View className={`mx-4 mb-4 ${colors.cardBackground} rounded-xl p-5`}>
             <View className="flex-row items-start justify-between">
               <Text className={`${colors.textSecondary} text-lg`}>Relationship Pulse</Text>
-              {/* <TouchableOpacity>
-                <Text className="text-blue-500">Check In</Text>
-              </TouchableOpacity> */}
               <View className="items-center">
                 <Text className={`${colors.textPrimary} text-xl`}>
                   <Text className="font-bold">{streakDays}</Text> Day Streak
                 </Text>
-                {/* <Text className={colors.textSecondary}>Day Streak</Text> */}
               </View>
             </View>
 
@@ -256,8 +238,6 @@ const HomeScreen = () => {
                 <Text className={`${colors.textPrimary} my-2 text-2xl font-bold`}>
                   {getMoodText(relationshipMood)}
                 </Text>
-
-                {/* Mood indicator bar */}
                 <View
                   className={`h-3 ${isDark ? 'bg-gray-700' : 'bg-gray-200'} my-4 w-full overflow-hidden rounded-full`}>
                   <View
@@ -268,7 +248,6 @@ const HomeScreen = () => {
                     style={{ width: `${relationshipMood * 20}%` }}
                   />
                 </View>
-
                 <Text className={colors.textSecondary}>
                   Last check-in: {lastCheckIn}. Keep the momentum going!
                 </Text>
@@ -292,7 +271,6 @@ const HomeScreen = () => {
             </TouchableOpacity>
           </View>
 
-          {/* Relationship Score Card */}
           <View className={`mx-4 mb-4 ${colors.cardBackground} rounded-xl p-5`}>
             <Text className={`${colors.textSecondary} mb-2 text-lg`}>Relationship Health</Text>
 
