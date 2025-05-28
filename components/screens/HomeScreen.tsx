@@ -178,6 +178,7 @@ const HomeScreen = () => {
   };
 
   const getMoodText = (score: number) => {
+    console.log('Calculating mood text for score:', score);
     if (score >= 4.5) return 'Excellent';
     if (score >= 3.5) return 'Good';
     if (score >= 2.5) return 'Neutral';
