@@ -43,7 +43,7 @@ const relationshipTips = [
 
 const HomeScreen = () => {
   const [currentTip, setCurrentTip] = useState(0);
-  const [isDark, setIsDark] = useState(Appearance.getColorScheme() === 'dark');
+  const { isDarkMode } = useTheme();
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(true);
@@ -55,12 +55,7 @@ const HomeScreen = () => {
   const [hasEnoughData, setHasEnoughData] = useState(false);
 
   useEffect(() => {
-    const subscription = Appearance.addChangeListener(({ colorScheme }) => {
-      setIsDark(useTheme().isDarkMode);
-    });
     loadUserData();
-
-    return () => subscription.remove();
   }, []);
 
   const loadUserData = async () => {
@@ -167,17 +162,41 @@ const HomeScreen = () => {
     setStreakDays(streak);
   };
 
-  const colors = {
-    // background: isDark ? 'bg-gray-900' : 'bg-white',
-    cardBackground: isDark ? 'bg-gray-800' : 'bg-gray-100',
-    textPrimary: isDark ? 'text-white' : 'text-gray-900',
-    textSecondary: isDark ? 'text-gray-400' : 'text-gray-600',
-    accent: 'text-blue-500',
-    accentBg: 'bg-blue-500',
-    actionBg: isDark ? 'bg-gray-700' : 'bg-gray-200',
-    tipBg: isDark ? 'bg-gray-700' : 'bg-blue-50',
-    border: isDark ? 'border-gray-800' : 'border-gray-300',
-  };
+  // const colors = {
+  //   // background: isDark ? 'bg-gray-900' : 'bg-white',
+  //   cardBackground: isDark ? 'bg-gray-800' : 'bg-gray-100',
+  //   textPrimary: isDark ? 'text-white' : 'text-gray-900',
+  //   textSecondary: isDark ? 'text-gray-400' : 'text-gray-600',
+  //   accent: 'text-blue-500',
+  //   accentBg: 'bg-blue-500',
+  //   actionBg: isDark ? 'bg-gray-700' : 'bg-gray-200',
+  //   tipBg: isDark ? 'bg-gray-700' : 'bg-blue-50',
+  //   border: isDark ? 'border-gray-800' : 'border-gray-300',
+  // };
+
+  const getThemedStyles = () => ({
+    // Card backgrounds - semi-transparent for gradient visibility
+    cardBackground: isDarkMode ? 'bg-charcoal/80' : 'bg-white/80',
+
+    // Text colors
+    textPrimary: isDarkMode ? 'text-soft-gray' : 'text-charcoal',
+    textSecondary: isDarkMode ? 'text-mauve-mist' : 'text-charcoal/70',
+
+    // Accent colors from your palette
+    accent: 'text-deep-plum',
+    accentBg: 'bg-deep-plum',
+
+    // Action button backgrounds
+    actionBg: isDarkMode ? 'bg-charcoal/60' : 'bg-soft-gray/80',
+
+    // Tip background
+    tipBg: isDarkMode ? 'bg-mauve-mist/20' : 'bg-peach-sorbet/50',
+
+    // Borders
+    border: isDarkMode ? 'border-charcoal/50' : 'border-mauve-mist/30',
+  });
+
+  const styles = getThemedStyles();
 
   const getMoodText = (score: number) => {
     console.log('Calculating mood text for score:', score);
@@ -200,40 +219,189 @@ const HomeScreen = () => {
     setCurrentTip((currentTip + 1) % relationshipTips.length);
   };
 
+  // return (
+  //   <GradientBackground>
+  //     <View className={`flex-1`}>
+  //       <View
+  //         className={`flex-row items-center justify-between border-b px-4 pb-3 pt-16 ${styles.border}`}>
+  //         <TouchableOpacity
+  //           className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-300"
+  //           onPress={() => navigation.navigate('Profile')}>
+  //           <Text className="text-lg font-bold">{userName.charAt(0)}</Text>
+  //         </TouchableOpacity>
+
+  //         <Text className="${styles.accent} text-2xl font-bold">RelatelyAI</Text>
+
+  //         <TouchableOpacity className="h-10 w-10 items-center justify-center">
+  //           <Bell size={24} color={isDarkMode ? '#C8A4B7' : '#7F4B6E'} />
+  //         </TouchableOpacity>
+  //       </View>
+
+  //       {loading ? (
+  //         <View className="flex-1 items-center justify-center">
+  //           <ActivityIndicator size="large" color="#3B82F6" />
+  //           <Text className={`mt-4 ${styles.textSecondary}`}>
+  //             Loading your relationship data...
+  //           </Text>
+  //         </View>
+  //       ) : (
+  //         <ScrollView className="flex-1">
+  //           <Text className={`text-2xl font-bold ${styles.textPrimary} px-4 py-3`}>Today</Text>
+
+  //           <View className={`mx-4 mb-4 ${styles.cardBackground} rounded-xl p-5`}>
+  //             <View className="flex-row items-start justify-between">
+  //               <Text className={`${styles.textSecondary} text-lg`}>Relationship Pulse</Text>
+  //               <View className="items-center">
+  //                 <Text className={`${styles.textPrimary} text-xl`}>
+  //                   <Text className="font-bold">{streakDays}</Text> Day Streak
+  //                 </Text>
+  //               </View>
+  //             </View>
+
+  //             {hasEnoughData ? (
+  //               <>
+  //                 <Text className={`${styles.textPrimary} my-2 text-2xl font-bold`}>
+  //                   {getMoodText(relationshipMood)}
+  //                 </Text>
+  //                 <View
+  //                   className={`h-3 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'} my-4 w-full overflow-hidden rounded-full`}>
+  //                   <View
+  //                     className={`h-full rounded-full ${getMoodColor(relationshipMood).replace(
+  //                       'text-',
+  //                       'bg-'
+  //                     )}`}
+  //                     style={{ width: `${relationshipMood * 20}%` }}
+  //                   />
+  //                 </View>
+  //                 <Text className={styles.textSecondary}>
+  //                   Last check-in: {lastCheckIn}. Keep the momentum going!
+  //                 </Text>
+  //               </>
+  //             ) : (
+  //               <View className="py-4">
+  //                 <Text className={`${styles.textPrimary} mb-2 text-lg`}>
+  //                   Not enough data to display your relationship pulse.
+  //                 </Text>
+  //                 <Text className={styles.textSecondary}>
+  //                   Complete check-ins on at least five different days to see your relationship
+  //                   health trends.
+  //                 </Text>
+  //               </View>
+  //             )}
+
+  //             <TouchableOpacity
+  //               className="mt-4 self-center rounded-full bg-blue-500 px-4 py-2"
+  //               onPress={() => navigation.navigate('Check In')}>
+  //               <Text className="font-semibold text-white">Add New Check-In</Text>
+  //             </TouchableOpacity>
+  //           </View>
+
+  //           <View className={`mx-4 mb-4 ${styles.cardBackground} rounded-xl p-5`}>
+  //             <Text className={`${styles.textSecondary} mb-2 text-lg`}>Relationship Health</Text>
+
+  //             <View className="items-center justify-center">
+  //               <View className="mb-4 h-48 w-48 items-center justify-center rounded-full border-8 border-blue-500">
+  //                 <Text className={`${styles.textPrimary} text-5xl font-bold`}>{quizScore}%</Text>
+  //                 <Text className={styles.textSecondary}>Health Score</Text>
+  //               </View>
+  //             </View>
+
+  //             <View className="mt-2 flex-row justify-center">
+  //               <TouchableOpacity
+  //                 className="flex justify-center rounded-full bg-blue-500 px-4 py-2"
+  //                 onPress={() => navigation.navigate('Assessment')}>
+  //                 <Text className="font-semibold text-white">Assess Your Relationship Health</Text>
+  //               </TouchableOpacity>
+  //             </View>
+  //           </View>
+
+  //           <View className={`mx-4 mb-4 ${styles.cardBackground} rounded-xl p-5`}>
+  //             <View className="mb-2 flex-row items-center justify-between">
+  //               <Text className={`${styles.textSecondary} text-lg`}>Daily Relationship Tip</Text>
+  //               <TouchableOpacity onPress={getNextTip}>
+  //                 <Text className="text-blue-500">Next Tip</Text>
+  //               </TouchableOpacity>
+  //             </View>
+
+  //             <View className={`${styles.tipBg} rounded-lg p-4`}>
+  //               <Text className={styles.textPrimary + ' text-lg'}>
+  //                 "{relationshipTips[currentTip]}"
+  //               </Text>
+  //             </View>
+  //           </View>
+
+  //           <View className={`mx-4 mb-16 ${styles.cardBackground} rounded-xl p-5`}>
+  //             <Text className={`${styles.textSecondary} mb-4 text-lg`}>Quick Actions</Text>
+
+  //             <View className="flex-row flex-wrap justify-between">
+  //               <TouchableOpacity
+  //                 className={`${styles.actionBg} mb-3 w-[48%] items-center rounded-lg p-3`}
+  //                 onPress={() => navigation.navigate('Chat')}>
+  //                 <MessageCircle size={24} color="#3B82F6" className="mb-2" />
+  //                 <Text className={styles.textPrimary}>Talk to AI</Text>
+  //               </TouchableOpacity>
+
+  //               <TouchableOpacity
+  //                 className={`${styles.actionBg} mb-3 w-[48%] items-center rounded-lg p-3`}
+  //                 onPress={() => navigation.navigate('Resources')}>
+  //                 <Book size={24} color="#3B82F6" className="mb-2" />
+  //                 <Text className={styles.textPrimary}>Resources</Text>
+  //               </TouchableOpacity>
+
+  //               <TouchableOpacity
+  //                 className={`${styles.actionBg} mb-3 w-[48%] items-center rounded-lg p-3`}>
+  //                 <Calendar size={24} color="#3B82F6" className="mb-2" />
+  //                 <Text className={styles.textPrimary}>Check-in History</Text>
+  //               </TouchableOpacity>
+
+  //               <TouchableOpacity
+  //                 className={`${styles.actionBg} mb-3 w-[48%] items-center rounded-lg p-3`}>
+  //                 <Heart size={24} color="#3B82F6" className="mb-2" />
+  //                 <Text className={styles.textPrimary}>Relationship Goals</Text>
+  //               </TouchableOpacity>
+  //             </View>
+  //           </View>
+  //         </ScrollView>
+  //       )}
+  //     </View>
+  //   </GradientBackground>
+  // );
   return (
     <GradientBackground>
-      <View className={`flex-1`}>
+      <View className="flex-1">
+        {/* Header */}
         <View
-          className={`flex-row items-center justify-between border-b px-4 pb-3 pt-16 ${colors.border}`}>
+          className={`flex-row items-center justify-between border-b px-4 pb-3 pt-16 ${styles.border}`}>
           <TouchableOpacity
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-300"
+            className="bg-deep-plum flex h-10 w-10 items-center justify-center rounded-full"
             onPress={() => navigation.navigate('Profile')}>
-            <Text className="text-lg font-bold">{userName.charAt(0)}</Text>
+            <Text className="text-lg font-bold text-white">{userName.charAt(0)}</Text>
           </TouchableOpacity>
 
-          <Text className="text-2xl font-bold text-blue-500">RelatelyAI</Text>
+          <Text className={`text-2xl font-bold ${styles.accent}`}>RelatelyAI</Text>
 
           <TouchableOpacity className="h-10 w-10 items-center justify-center">
-            <Bell size={24} color={isDark ? '#A3A3A3' : '#4B5563'} />
+            <Bell size={24} color={isDarkMode ? '#C8A4B7' : '#7F4B6E'} />
           </TouchableOpacity>
         </View>
 
         {loading ? (
           <View className="flex-1 items-center justify-center">
-            <ActivityIndicator size="large" color="#3B82F6" />
-            <Text className={`mt-4 ${colors.textSecondary}`}>
+            <ActivityIndicator size="large" color="#7F4B6E" />
+            <Text className={`mt-4 ${styles.textSecondary}`}>
               Loading your relationship data...
             </Text>
           </View>
         ) : (
           <ScrollView className="flex-1">
-            <Text className={`text-2xl font-bold ${colors.textPrimary} px-4 py-3`}>Today</Text>
+            <Text className={`text-2xl font-bold ${styles.textPrimary} px-4 py-3`}>Today</Text>
 
-            <View className={`mx-4 mb-4 ${colors.cardBackground} rounded-xl p-5`}>
+            {/* Relationship Pulse Card */}
+            <View className={`mx-4 mb-4 ${styles.cardBackground} rounded-xl p-5`}>
               <View className="flex-row items-start justify-between">
-                <Text className={`${colors.textSecondary} text-lg`}>Relationship Pulse</Text>
+                <Text className={`${styles.textSecondary} text-lg`}>Relationship Pulse</Text>
                 <View className="items-center">
-                  <Text className={`${colors.textPrimary} text-xl`}>
+                  <Text className={`${styles.textPrimary} text-xl`}>
                     <Text className="font-bold">{streakDays}</Text> Day Streak
                   </Text>
                 </View>
@@ -241,29 +409,25 @@ const HomeScreen = () => {
 
               {hasEnoughData ? (
                 <>
-                  <Text className={`${colors.textPrimary} my-2 text-2xl font-bold`}>
+                  <Text className={`${styles.textPrimary} my-2 text-2xl font-bold`}>
                     {getMoodText(relationshipMood)}
                   </Text>
-                  <View
-                    className={`h-3 ${isDark ? 'bg-gray-700' : 'bg-gray-200'} my-4 w-full overflow-hidden rounded-full`}>
+                  <View className={`bg-mauve-mist/30 my-4 h-3 w-full overflow-hidden rounded-full`}>
                     <View
-                      className={`h-full rounded-full ${getMoodColor(relationshipMood).replace(
-                        'text-',
-                        'bg-'
-                      )}`}
+                      className={`h-full rounded-full ${getMoodColor(relationshipMood).replace('text-', 'bg-')}`}
                       style={{ width: `${relationshipMood * 20}%` }}
                     />
                   </View>
-                  <Text className={colors.textSecondary}>
+                  <Text className={styles.textSecondary}>
                     Last check-in: {lastCheckIn}. Keep the momentum going!
                   </Text>
                 </>
               ) : (
                 <View className="py-4">
-                  <Text className={`${colors.textPrimary} mb-2 text-lg`}>
+                  <Text className={`${styles.textPrimary} mb-2 text-lg`}>
                     Not enough data to display your relationship pulse.
                   </Text>
-                  <Text className={colors.textSecondary}>
+                  <Text className={styles.textSecondary}>
                     Complete check-ins on at least five different days to see your relationship
                     health trends.
                   </Text>
@@ -271,74 +435,78 @@ const HomeScreen = () => {
               )}
 
               <TouchableOpacity
-                className="mt-4 self-center rounded-full bg-blue-500 px-4 py-2"
+                className={`mt-4 self-center rounded-full ${styles.accentBg} px-4 py-2`}
                 onPress={() => navigation.navigate('Check In')}>
                 <Text className="font-semibold text-white">Add New Check-In</Text>
               </TouchableOpacity>
             </View>
 
-            <View className={`mx-4 mb-4 ${colors.cardBackground} rounded-xl p-5`}>
-              <Text className={`${colors.textSecondary} mb-2 text-lg`}>Relationship Health</Text>
+            {/* Relationship Health Card */}
+            <View className={`mx-4 mb-4 ${styles.cardBackground} rounded-xl p-5`}>
+              <Text className={`${styles.textSecondary} mb-2 text-lg`}>Relationship Health</Text>
 
               <View className="items-center justify-center">
-                <View className="mb-4 h-48 w-48 items-center justify-center rounded-full border-8 border-blue-500">
-                  <Text className={`${colors.textPrimary} text-5xl font-bold`}>{quizScore}%</Text>
-                  <Text className={colors.textSecondary}>Health Score</Text>
+                <View
+                  className={`border-deep-plum mb-4 h-48 w-48 items-center justify-center rounded-full border-8`}>
+                  <Text className={`${styles.textPrimary} text-5xl font-bold`}>{quizScore}%</Text>
+                  <Text className={styles.textSecondary}>Health Score</Text>
                 </View>
               </View>
 
               <View className="mt-2 flex-row justify-center">
                 <TouchableOpacity
-                  className="flex justify-center rounded-full bg-blue-500 px-4 py-2"
+                  className={`flex justify-center rounded-full ${styles.accentBg} px-4 py-2`}
                   onPress={() => navigation.navigate('Assessment')}>
                   <Text className="font-semibold text-white">Assess Your Relationship Health</Text>
                 </TouchableOpacity>
               </View>
             </View>
 
-            <View className={`mx-4 mb-4 ${colors.cardBackground} rounded-xl p-5`}>
+            {/* Daily Tip Card */}
+            <View className={`mx-4 mb-4 ${styles.cardBackground} rounded-xl p-5`}>
               <View className="mb-2 flex-row items-center justify-between">
-                <Text className={`${colors.textSecondary} text-lg`}>Daily Relationship Tip</Text>
+                <Text className={`${styles.textSecondary} text-lg`}>Daily Relationship Tip</Text>
                 <TouchableOpacity onPress={getNextTip}>
-                  <Text className="text-blue-500">Next Tip</Text>
+                  <Text className={styles.accent}>Next Tip</Text>
                 </TouchableOpacity>
               </View>
 
-              <View className={`${colors.tipBg} rounded-lg p-4`}>
-                <Text className={colors.textPrimary + ' text-lg'}>
+              <View className={`${styles.tipBg} rounded-lg p-4`}>
+                <Text className={`${styles.textPrimary} text-lg`}>
                   "{relationshipTips[currentTip]}"
                 </Text>
               </View>
             </View>
 
-            <View className={`mx-4 mb-16 ${colors.cardBackground} rounded-xl p-5`}>
-              <Text className={`${colors.textSecondary} mb-4 text-lg`}>Quick Actions</Text>
+            {/* Quick Actions Card */}
+            <View className={`mx-4 mb-16 ${styles.cardBackground} rounded-xl p-5`}>
+              <Text className={`${styles.textSecondary} mb-4 text-lg`}>Quick Actions</Text>
 
               <View className="flex-row flex-wrap justify-between">
                 <TouchableOpacity
-                  className={`${colors.actionBg} mb-3 w-[48%] items-center rounded-lg p-3`}
+                  className={`${styles.actionBg} mb-3 w-[48%] items-center rounded-lg p-3`}
                   onPress={() => navigation.navigate('Chat')}>
-                  <MessageCircle size={24} color="#3B82F6" className="mb-2" />
-                  <Text className={colors.textPrimary}>Talk to AI</Text>
+                  <MessageCircle size={24} color="#7F4B6E" className="mb-2" />
+                  <Text className={styles.textPrimary}>Talk to AI</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  className={`${colors.actionBg} mb-3 w-[48%] items-center rounded-lg p-3`}
+                  className={`${styles.actionBg} mb-3 w-[48%] items-center rounded-lg p-3`}
                   onPress={() => navigation.navigate('Resources')}>
-                  <Book size={24} color="#3B82F6" className="mb-2" />
-                  <Text className={colors.textPrimary}>Resources</Text>
+                  <Book size={24} color="#7F4B6E" className="mb-2" />
+                  <Text className={styles.textPrimary}>Resources</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  className={`${colors.actionBg} mb-3 w-[48%] items-center rounded-lg p-3`}>
-                  <Calendar size={24} color="#3B82F6" className="mb-2" />
-                  <Text className={colors.textPrimary}>Check-in History</Text>
+                  className={`${styles.actionBg} mb-3 w-[48%] items-center rounded-lg p-3`}>
+                  <Calendar size={24} color="#7F4B6E" className="mb-2" />
+                  <Text className={styles.textPrimary}>Check-in History</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  className={`${colors.actionBg} mb-3 w-[48%] items-center rounded-lg p-3`}>
-                  <Heart size={24} color="#3B82F6" className="mb-2" />
-                  <Text className={colors.textPrimary}>Relationship Goals</Text>
+                  className={`${styles.actionBg} mb-3 w-[48%] items-center rounded-lg p-3`}>
+                  <Heart size={24} color="#7F4B6E" className="mb-2" />
+                  <Text className={styles.textPrimary}>Relationship Goals</Text>
                 </TouchableOpacity>
               </View>
             </View>
