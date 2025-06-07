@@ -18,6 +18,7 @@ import SignInScreen from './components/screens/auth/SignInScreen';
 import SignUpScreen from './components/screens/auth/SignUpScreen';
 import { AuthProvider, useAuth } from './components/contexts/AuthContext';
 import { GradientBackground } from 'components/ui/GradientBackground';
+import OnboardingWelcomeScreen from 'components/screens/onboarding/WelcomeScreen';
 
 export type RootStackParamList = {
   App: undefined;
@@ -93,7 +94,11 @@ const RootNavigator = () => {
       ) : (
         <>
           <Stack.Screen name="SignIn" component={SignInScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
+          <Stack.Screen
+            name="SignUp"
+            component={OnboardingWelcomeScreen}
+            options={{ headerShown: false }}
+          />
         </>
       )}
     </Stack.Navigator>
