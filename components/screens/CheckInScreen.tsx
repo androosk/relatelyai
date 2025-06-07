@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import EmotionSelector from '../ui/EmotionSelector';
 import { checkinService } from 'components/services/checkinService';
+import { GradientBackground } from 'components/ui/GradientBackground';
 
 export default function CheckInScreen() {
   const [checkIns, setCheckIns] = useState<any[]>([]);
@@ -81,78 +82,80 @@ export default function CheckInScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <ScrollView className="px-4">
-        <Text className="mb-6 text-2xl font-bold text-indigo-600">Relationship Check-In</Text>
+    <GradientBackground>
+      <SafeAreaView className="flex-1" style={{ backgroundColor: 'transparent' }}>
+        <ScrollView className="px-4">
+          <Text className="mb-6 text-2xl font-bold text-indigo-600">Relationship Check-In</Text>
 
-        <View className="mb-6 rounded-lg bg-white p-6 shadow">
-          <Text className="mb-4 text-lg font-medium">
-            How are you feeling about your relationship today?
-          </Text>
-
-          <EmotionSelector selectedEmotion={currentEmotion} onSelectEmotion={setCurrentEmotion} />
-
-          <Text className="mb-2 mt-6 text-base font-medium">Notes</Text>
-          <TextInput
-            className="min-h-16 rounded-lg border border-gray-300 p-3 text-base"
-            multiline
-            placeholder="Add any thoughts about your relationship today..."
-            value={notes}
-            onChangeText={setNotes}
-          />
-
-          <TouchableOpacity
-            className="mt-6 rounded-lg bg-indigo-600 px-6 py-3"
-            onPress={saveCheckIn}>
-            <Text className="text-center font-semibold text-white">Save Check-In</Text>
-          </TouchableOpacity>
-        </View>
-
-        <Text className="mb-4 text-xl font-semibold">Previous Check-Ins</Text>
-        {loading && (
-          <View className="items-center py-8">
-            <ActivityIndicator size="large" color="#6366f1" />
-            <Text className="mt-2 text-gray-500">Loading check-ins...</Text>
-          </View>
-        )}
-
-        {checkIns.length > 0 &&
-          !loading &&
-          checkIns.map((checkIn) => (
-            <View key={checkIn.id} className="mb-4 rounded-lg bg-white p-4 shadow">
-              <View className="mb-2 flex-row items-center justify-between">
-                <Text className="text-gray-500">{formatDate(checkIn.created_at)}</Text>
-                <View className="rounded-full bg-indigo-100 px-3 py-1">
-                  <Text className="font-medium text-indigo-700">
-                    {getEmotionText(checkIn.mood_score)}
-                  </Text>
-                </View>
-              </View>
-              {checkIn.notes ? (
-                <Text className="text-gray-700">{checkIn.notes}</Text>
-              ) : (
-                <Text className="italic text-gray-400">No notes</Text>
-              )}
-              <TouchableOpacity
-                className="mt-3 self-end"
-                onPress={() => handleDeleteCheckin(checkIn.id)}>
-                <Text className="text-sm text-red-500">Delete</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-        {error && !loading && (
-          <View className="mb-4 rounded-lg bg-red-100 p-3">
-            <Text className="text-red-700">{error}</Text>
-          </View>
-        )}
-        {checkIns.length == 0 && !loading && (
-          <View className="items-center rounded-lg bg-white p-8 shadow">
-            <Text className="text-center text-gray-500">
-              No check-ins yet. Start tracking your relationship mood today!
+          <View className="mb-6 rounded-lg bg-white p-6 shadow">
+            <Text className="mb-4 text-lg font-medium">
+              How are you feeling about your relationship today?
             </Text>
+
+            <EmotionSelector selectedEmotion={currentEmotion} onSelectEmotion={setCurrentEmotion} />
+
+            <Text className="mb-2 mt-6 text-base font-medium">Notes</Text>
+            <TextInput
+              className="min-h-16 rounded-lg border border-gray-300 p-3 text-base"
+              multiline
+              placeholder="Add any thoughts about your relationship today..."
+              value={notes}
+              onChangeText={setNotes}
+            />
+
+            <TouchableOpacity
+              className="mt-6 rounded-lg bg-indigo-600 px-6 py-3"
+              onPress={saveCheckIn}>
+              <Text className="text-center font-semibold text-white">Save Check-In</Text>
+            </TouchableOpacity>
           </View>
-        )}
-      </ScrollView>
-    </SafeAreaView>
+
+          <Text className="mb-4 text-xl font-semibold">Previous Check-Ins</Text>
+          {loading && (
+            <View className="items-center py-8">
+              <ActivityIndicator size="large" color="#6366f1" />
+              <Text className="mt-2 text-gray-500">Loading check-ins...</Text>
+            </View>
+          )}
+
+          {checkIns.length > 0 &&
+            !loading &&
+            checkIns.map((checkIn) => (
+              <View key={checkIn.id} className="mb-4 rounded-lg bg-white p-4 shadow">
+                <View className="mb-2 flex-row items-center justify-between">
+                  <Text className="text-gray-500">{formatDate(checkIn.created_at)}</Text>
+                  <View className="rounded-full bg-indigo-100 px-3 py-1">
+                    <Text className="font-medium text-indigo-700">
+                      {getEmotionText(checkIn.mood_score)}
+                    </Text>
+                  </View>
+                </View>
+                {checkIn.notes ? (
+                  <Text className="text-gray-700">{checkIn.notes}</Text>
+                ) : (
+                  <Text className="italic text-gray-400">No notes</Text>
+                )}
+                <TouchableOpacity
+                  className="mt-3 self-end"
+                  onPress={() => handleDeleteCheckin(checkIn.id)}>
+                  <Text className="text-sm text-red-500">Delete</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          {error && !loading && (
+            <View className="mb-4 rounded-lg bg-red-100 p-3">
+              <Text className="text-red-700">{error}</Text>
+            </View>
+          )}
+          {checkIns.length == 0 && !loading && (
+            <View className="items-center rounded-lg bg-white p-8 shadow">
+              <Text className="text-center text-gray-500">
+                No check-ins yet. Start tracking your relationship mood today!
+              </Text>
+            </View>
+          )}
+        </ScrollView>
+      </SafeAreaView>
+    </GradientBackground>
   );
 }

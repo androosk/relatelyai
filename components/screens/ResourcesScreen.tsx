@@ -1,6 +1,7 @@
 import { View, Text, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FontAwesome } from '@expo/vector-icons';
+import { GradientBackground } from 'components/ui/GradientBackground';
 
 type Resource = {
   id: string;
@@ -92,33 +93,35 @@ export default function ResourcesScreen() {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <ScrollView className="px-4 py-6">
-        <Text className="mb-6 text-2xl font-bold text-indigo-600">Relationship Resources</Text>
+    <GradientBackground>
+      <SafeAreaView className="flex-1">
+        <ScrollView className="px-4 py-6">
+          <Text className="mb-6 text-2xl font-bold text-indigo-600">Relationship Resources</Text>
 
-        <Text className="mb-6 text-base text-gray-600">
-          Explore these resources to improve your relationship skills and understand relationship
-          dynamics better.
-        </Text>
-
-        {resources.map(renderResourceCard)}
-
-        <View className="mt-6 rounded-lg bg-indigo-50 p-4">
-          <Text className="mb-2 text-base font-medium text-indigo-800">Need immediate help?</Text>
-          <Text className="mb-3 text-gray-700">
-            If you're experiencing relationship abuse or need immediate support, please reach out to
-            these resources:
+          <Text className="mb-6 text-base text-gray-600">
+            Explore these resources to improve your relationship skills and understand relationship
+            dynamics better.
           </Text>
-          <TouchableOpacity
-            className="mb-2 flex-row items-center"
-            onPress={() => Linking.openURL('tel:18007997233')}>
-            <FontAwesome name="phone" size={16} color="#4f46e5" className="mr-2" />
-            <Text className="text-indigo-600">
-              National Domestic Violence Hotline: 1-800-799-7233
+
+          {resources.map(renderResourceCard)}
+
+          <View className="mt-6 rounded-lg bg-indigo-50 p-4">
+            <Text className="mb-2 text-base font-medium text-indigo-800">Need immediate help?</Text>
+            <Text className="mb-3 text-gray-700">
+              If you're experiencing relationship abuse or need immediate support, please reach out
+              to these resources:
             </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+            <TouchableOpacity
+              className="mb-2 flex-row items-center"
+              onPress={() => Linking.openURL('tel:18007997233')}>
+              <FontAwesome name="phone" size={16} color="#4f46e5" className="mr-2" />
+              <Text className="text-indigo-600">
+                National Domestic Violence Hotline: 1-800-799-7233
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </GradientBackground>
   );
 }

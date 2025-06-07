@@ -15,6 +15,7 @@ import { Message } from 'types/chat';
 import { format } from 'date-fns';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { ChatScreenNavigationProp } from 'types/navigation';
+import { GradientBackground } from 'components/ui/GradientBackground';
 
 const safeFormat = (date: Date, formatString: string): string => {
   try {
@@ -175,60 +176,62 @@ const ChatScreen = () => {
   }
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-gray-50"
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
-      <View className="flex-row items-center justify-between border-b border-gray-200 bg-white p-4">
-        <Text className="text-lg font-bold text-indigo-600">Relationship Advisor</Text>
-        <TouchableOpacity className="rounded-lg p-2" onPress={navigateToHistory}>
-          <Ionicons name="list" size={24} color="#4F46E5" />
-        </TouchableOpacity>
-      </View>
+    <GradientBackground>
+      <KeyboardAvoidingView
+        className="flex-1"
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
+        <View className="flex-row items-center justify-between border-b border-gray-200 bg-white p-4">
+          <Text className="text-lg font-bold text-indigo-600">Relationship Advisor</Text>
+          <TouchableOpacity className="rounded-lg p-2" onPress={navigateToHistory}>
+            <Ionicons name="list" size={24} color="#4F46E5" />
+          </TouchableOpacity>
+        </View>
 
-      <FlatList
-        ref={flatListRef}
-        data={messages}
-        renderItem={renderMessage}
-        keyExtractor={(item) => item.id}
-        contentContainerClassName="p-4 pb-6"
-        ListHeaderComponent={renderWelcomeMessage}
-        ListFooterComponent={
-          loading && messages.length > 0 ? (
-            <View className="my-3 flex-row items-center self-start rounded-2xl bg-gray-100 px-3 py-1.5">
-              <ActivityIndicator size="small" color="#4F46E5" />
-              <Text className="ml-2 text-sm text-gray-600">Thinking...</Text>
-            </View>
-          ) : null
-        }
-      />
-
-      <View className="flex-row border-t border-gray-200 bg-white px-4 py-3">
-        <TextInput
-          className="max-h-24 flex-1 rounded-full bg-gray-100 px-4 py-2.5 text-base text-gray-800"
-          value={inputText}
-          onChangeText={setInputText}
-          placeholder={
-            currentSession
-              ? 'Type your message...'
-              : sessions.length > 0
-                ? 'Start a new conversation...'
-                : 'Type your first message...'
+        <FlatList
+          ref={flatListRef}
+          data={messages}
+          renderItem={renderMessage}
+          keyExtractor={(item) => item.id}
+          contentContainerClassName="p-4 pb-6"
+          ListHeaderComponent={renderWelcomeMessage}
+          ListFooterComponent={
+            loading && messages.length > 0 ? (
+              <View className="my-3 flex-row items-center self-start rounded-2xl bg-gray-100 px-3 py-1.5">
+                <ActivityIndicator size="small" color="#4F46E5" />
+                <Text className="ml-2 text-sm text-gray-600">Thinking...</Text>
+              </View>
+            ) : null
           }
-          placeholderTextColor="#9CA3AF"
-          multiline
-          maxLength={1000}
         />
-        <TouchableOpacity
-          className={`ml-2 h-10 w-10 items-center justify-center rounded-full ${
-            !inputText.trim() ? 'bg-gray-200' : 'bg-indigo-600'
-          }`}
-          onPress={handleSend}
-          disabled={!inputText.trim() || loading}>
-          <Ionicons name="send" size={20} color={!inputText.trim() ? '#9CA3AF' : '#FFFFFF'} />
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+
+        <View className="flex-row px-4 py-3">
+          <TextInput
+            className="max-h-24 flex-1 rounded-full bg-gray-100 px-4 py-2.5 text-base text-gray-800"
+            value={inputText}
+            onChangeText={setInputText}
+            placeholder={
+              currentSession
+                ? 'Type your message...'
+                : sessions.length > 0
+                  ? 'Start a new conversation...'
+                  : 'Type your first message...'
+            }
+            placeholderTextColor="#9CA3AF"
+            multiline
+            maxLength={1000}
+          />
+          <TouchableOpacity
+            className={`ml-2 h-10 w-10 items-center justify-center rounded-full ${
+              !inputText.trim() ? 'bg-gray-200' : 'bg-indigo-600'
+            }`}
+            onPress={handleSend}
+            disabled={!inputText.trim() || loading}>
+            <Ionicons name="send" size={20} color={!inputText.trim() ? '#9CA3AF' : '#FFFFFF'} />
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </GradientBackground>
   );
 };
 

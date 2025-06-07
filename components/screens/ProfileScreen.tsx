@@ -4,6 +4,7 @@ import { profileService, Profile } from 'components/services/profileService';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from 'App';
 import { useAuth } from '../contexts/AuthContext';
+import { GradientBackground } from 'components/ui/GradientBackground';
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Profile'>;
 
@@ -55,77 +56,79 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   }
 
   return (
-    <View className="flex-1 bg-gray-50 p-6">
-      <View className="rounded-xl bg-white p-6 shadow-sm">
-        <Text className="mb-6 text-center text-2xl font-bold text-gray-800">Your Profile</Text>
+    <GradientBackground>
+      <View className="flex-1 p-6">
+        <View className="rounded-xl bg-white p-6 shadow-sm">
+          <Text className="mb-6 text-center text-2xl font-bold text-gray-800">Your Profile</Text>
 
-        <View className="mb-4">
-          <Text className="mb-1 text-sm font-medium text-gray-500">First Name</Text>
-          <Text className="text-lg font-medium text-gray-800">
-            {userProfile?.first_name || 'Not set'}
-          </Text>
-        </View>
-
-        <View className="mb-4">
-          <Text className="mb-1 text-sm font-medium text-gray-500">Last Name</Text>
-          <Text className="text-lg font-medium text-gray-800">
-            {userProfile?.last_name || 'Not set'}
-          </Text>
-        </View>
-
-        <View className="mb-4">
-          <Text className="mb-1 text-sm font-medium text-gray-500">Relationship Status</Text>
-          <Text className="text-lg font-medium text-gray-800">
-            {userProfile?.relationship_status || 'Not set'}
-          </Text>
-        </View>
-
-        {userProfile?.relationship_start_date && (
           <View className="mb-4">
-            <Text className="mb-1 text-sm font-medium text-gray-500">{`First Date`}</Text>
+            <Text className="mb-1 text-sm font-medium text-gray-500">First Name</Text>
             <Text className="text-lg font-medium text-gray-800">
-              {userProfile?.relationship_start_date}
+              {userProfile?.first_name || 'Not set'}
             </Text>
           </View>
-        )}
 
-        {userProfile?.anniversary_date && (
           <View className="mb-4">
-            <Text className="mb-1 text-sm font-medium text-gray-500">{`Anniversary`}</Text>
+            <Text className="mb-1 text-sm font-medium text-gray-500">Last Name</Text>
             <Text className="text-lg font-medium text-gray-800">
-              {userProfile?.anniversary_date}
+              {userProfile?.last_name || 'Not set'}
             </Text>
           </View>
-        )}
 
-        {userProfile?.partner_name && (
           <View className="mb-4">
-            <Text className="mb-1 text-sm font-medium text-gray-500">Partner Name</Text>
-            <Text className="text-lg font-medium text-gray-800">{userProfile?.partner_name}</Text>
-          </View>
-        )}
-        {userProfile?.partner_name && (
-          <View className="mb-4">
-            <Text className="mb-1 text-sm font-medium text-gray-500">{`${userProfile.partner_name}'s Birthday`}</Text>
+            <Text className="mb-1 text-sm font-medium text-gray-500">Relationship Status</Text>
             <Text className="text-lg font-medium text-gray-800">
-              {userProfile?.partner_birthdate || 'Not set'}
+              {userProfile?.relationship_status || 'Not set'}
             </Text>
           </View>
-        )}
 
-        <TouchableOpacity
-          className="mt-6 rounded-lg bg-indigo-600 px-4 py-3"
-          onPress={() => navigation.navigate('EditProfile')}>
-          <Text className="text-center font-semibold text-white">Edit Profile</Text>
-        </TouchableOpacity>
+          {userProfile?.relationship_start_date && (
+            <View className="mb-4">
+              <Text className="mb-1 text-sm font-medium text-gray-500">{`First Date`}</Text>
+              <Text className="text-lg font-medium text-gray-800">
+                {userProfile?.relationship_start_date}
+              </Text>
+            </View>
+          )}
 
-        <TouchableOpacity
-          className="mt-3 rounded-lg border border-red-500 px-4 py-3"
-          onPress={handleLogout}>
-          <Text className="text-center font-semibold text-red-500">Log Out</Text>
-        </TouchableOpacity>
+          {userProfile?.anniversary_date && (
+            <View className="mb-4">
+              <Text className="mb-1 text-sm font-medium text-gray-500">{`Anniversary`}</Text>
+              <Text className="text-lg font-medium text-gray-800">
+                {userProfile?.anniversary_date}
+              </Text>
+            </View>
+          )}
+
+          {userProfile?.partner_name && (
+            <View className="mb-4">
+              <Text className="mb-1 text-sm font-medium text-gray-500">Partner Name</Text>
+              <Text className="text-lg font-medium text-gray-800">{userProfile?.partner_name}</Text>
+            </View>
+          )}
+          {userProfile?.partner_name && (
+            <View className="mb-4">
+              <Text className="mb-1 text-sm font-medium text-gray-500">{`${userProfile.partner_name}'s Birthday`}</Text>
+              <Text className="text-lg font-medium text-gray-800">
+                {userProfile?.partner_birthdate || 'Not set'}
+              </Text>
+            </View>
+          )}
+
+          <TouchableOpacity
+            className="mt-6 rounded-lg bg-indigo-600 px-4 py-3"
+            onPress={() => navigation.navigate('EditProfile')}>
+            <Text className="text-center font-semibold text-white">Edit Profile</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            className="mt-3 rounded-lg border border-red-500 px-4 py-3"
+            onPress={handleLogout}>
+            <Text className="text-center font-semibold text-red-500">Log Out</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </GradientBackground>
   );
 };
 

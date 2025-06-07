@@ -15,6 +15,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { profileService } from 'components/services/profileService';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from 'App';
+import { GradientBackground } from 'components/ui/GradientBackground';
 
 type EditProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'EditProfile'>;
 
@@ -162,218 +163,222 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ navigation }) => 
 
   return (
     <ScrollView className="flex-1 bg-gray-50">
-      <View className="p-6">
-        <View className="rounded-xl bg-white p-6 shadow-sm">
-          <Text className="mb-6 text-center text-2xl font-bold text-gray-800">Edit Profile</Text>
+      <GradientBackground>
+        <View className="p-6">
+          <View className="rounded-xl bg-white p-6 shadow-sm">
+            <Text className="mb-6 text-center text-2xl font-bold text-gray-800">Edit Profile</Text>
 
-          {/* Basic Information */}
-          <View className="mb-6">
-            <Text className="mb-4 text-lg font-semibold text-gray-700">Basic Information</Text>
+            {/* Basic Information */}
+            <View className="mb-6">
+              <Text className="mb-4 text-lg font-semibold text-gray-700">Basic Information</Text>
 
-            <View className="mb-4">
-              <Text className="mb-2 text-sm font-medium text-gray-500">Username</Text>
-              <TextInput
-                className="rounded-lg border border-gray-300 px-4 py-3 text-gray-800"
-                value={username}
-                onChangeText={setUsername}
-                placeholder="Enter username"
-              />
+              <View className="mb-4">
+                <Text className="mb-2 text-sm font-medium text-gray-500">Username</Text>
+                <TextInput
+                  className="rounded-lg border border-gray-300 px-4 py-3 text-gray-800"
+                  value={username}
+                  onChangeText={setUsername}
+                  placeholder="Enter username"
+                />
+              </View>
+
+              <View className="mb-4">
+                <Text className="mb-2 text-sm font-medium text-gray-500">First Name</Text>
+                <TextInput
+                  className="rounded-lg border border-gray-300 px-4 py-3 text-gray-800"
+                  value={firstName}
+                  onChangeText={setFirstName}
+                  placeholder="Enter first name"
+                />
+              </View>
+
+              <View className="mb-4">
+                <Text className="mb-2 text-sm font-medium text-gray-500">Last Name</Text>
+                <TextInput
+                  className="rounded-lg border border-gray-300 px-4 py-3 text-gray-800"
+                  value={lastName}
+                  onChangeText={setLastName}
+                  placeholder="Enter last name"
+                />
+              </View>
+
+              <View className="mb-4">
+                <Text className="mb-2 text-sm font-medium text-gray-500">Age</Text>
+                <TextInput
+                  className="rounded-lg border border-gray-300 px-4 py-3 text-gray-800"
+                  value={age}
+                  onChangeText={setAge}
+                  placeholder="Enter age"
+                  keyboardType="numeric"
+                />
+              </View>
+
+              <View className="mb-4">
+                <Text className="mb-2 text-sm font-medium text-gray-500">Bio</Text>
+                <TextInput
+                  className="rounded-lg border border-gray-300 px-4 py-3 text-gray-800"
+                  value={bio}
+                  onChangeText={setBio}
+                  placeholder="Tell us about yourself"
+                  multiline
+                  numberOfLines={4}
+                  textAlignVertical="top"
+                />
+              </View>
             </View>
 
-            <View className="mb-4">
-              <Text className="mb-2 text-sm font-medium text-gray-500">First Name</Text>
-              <TextInput
-                className="rounded-lg border border-gray-300 px-4 py-3 text-gray-800"
-                value={firstName}
-                onChangeText={setFirstName}
-                placeholder="Enter first name"
-              />
-            </View>
+            {/* Relationship Information */}
+            <View className="mb-6">
+              <Text className="mb-4 text-lg font-semibold text-gray-700">
+                Relationship Information
+              </Text>
 
-            <View className="mb-4">
-              <Text className="mb-2 text-sm font-medium text-gray-500">Last Name</Text>
-              <TextInput
-                className="rounded-lg border border-gray-300 px-4 py-3 text-gray-800"
-                value={lastName}
-                onChangeText={setLastName}
-                placeholder="Enter last name"
-              />
-            </View>
+              <StatusDropdown value={relationshipStatus} setValue={setRelationshipStatus} />
 
-            <View className="mb-4">
-              <Text className="mb-2 text-sm font-medium text-gray-500">Age</Text>
-              <TextInput
-                className="rounded-lg border border-gray-300 px-4 py-3 text-gray-800"
-                value={age}
-                onChangeText={setAge}
-                placeholder="Enter age"
-                keyboardType="numeric"
-              />
-            </View>
-
-            <View className="mb-4">
-              <Text className="mb-2 text-sm font-medium text-gray-500">Bio</Text>
-              <TextInput
-                className="rounded-lg border border-gray-300 px-4 py-3 text-gray-800"
-                value={bio}
-                onChangeText={setBio}
-                placeholder="Tell us about yourself"
-                multiline
-                numberOfLines={4}
-                textAlignVertical="top"
-              />
-            </View>
-          </View>
-
-          {/* Relationship Information */}
-          <View className="mb-6">
-            <Text className="mb-4 text-lg font-semibold text-gray-700">
-              Relationship Information
-            </Text>
-
-            <StatusDropdown value={relationshipStatus} setValue={setRelationshipStatus} />
-
-            {relationshipStatus !== 'Single' && relationshipStatus !== '' && (
-              <>
-                <View className="mb-4">
-                  <Text className="mb-2 text-sm font-medium text-gray-500">Partner Name</Text>
-                  <TextInput
-                    className="rounded-lg border border-gray-300 px-4 py-3 text-gray-800"
-                    value={partnerName}
-                    onChangeText={setPartnerName}
-                    placeholder="Enter partner's name"
-                  />
-                </View>
-
-                <View className="mb-4">
-                  <Text className="mb-2 text-sm font-medium text-gray-500">
-                    Relationship Start Date
-                  </Text>
-                  <TouchableOpacity
-                    className="rounded-lg border border-gray-300 px-4 py-3"
-                    onPress={() => setShowStartDatePicker(true)}>
-                    <Text className="text-gray-800">
-                      {relationshipStartDate ? formatDate(relationshipStartDate) : 'Select date'}
-                    </Text>
-                  </TouchableOpacity>
-                  {showStartDatePicker && (
-                    <DateTimePicker
-                      value={relationshipStartDate || new Date()}
-                      mode="date"
-                      display="default"
-                      onChange={onStartDateChange}
+              {relationshipStatus !== 'Single' && relationshipStatus !== '' && (
+                <>
+                  <View className="mb-4">
+                    <Text className="mb-2 text-sm font-medium text-gray-500">Partner Name</Text>
+                    <TextInput
+                      className="rounded-lg border border-gray-300 px-4 py-3 text-gray-800"
+                      value={partnerName}
+                      onChangeText={setPartnerName}
+                      placeholder="Enter partner's name"
                     />
-                  )}
-                </View>
+                  </View>
 
-                <View className="mb-4">
-                  <Text className="mb-2 text-sm font-medium text-gray-500">Anniversary Date</Text>
-                  <TouchableOpacity
-                    className="rounded-lg border border-gray-300 px-4 py-3"
-                    onPress={() => setShowAnniversaryPicker(true)}>
-                    <Text className="text-gray-800">
-                      {anniversaryDate ? formatDate(anniversaryDate) : 'Select date'}
+                  <View className="mb-4">
+                    <Text className="mb-2 text-sm font-medium text-gray-500">
+                      Relationship Start Date
                     </Text>
-                  </TouchableOpacity>
-                  {showAnniversaryPicker && (
-                    <DateTimePicker
-                      value={anniversaryDate || new Date()}
-                      mode="date"
-                      display="default"
-                      onChange={onAnniversaryChange}
-                    />
-                  )}
-                </View>
+                    <TouchableOpacity
+                      className="rounded-lg border border-gray-300 px-4 py-3"
+                      onPress={() => setShowStartDatePicker(true)}>
+                      <Text className="text-gray-800">
+                        {relationshipStartDate ? formatDate(relationshipStartDate) : 'Select date'}
+                      </Text>
+                    </TouchableOpacity>
+                    {showStartDatePicker && (
+                      <DateTimePicker
+                        value={relationshipStartDate || new Date()}
+                        mode="date"
+                        display="default"
+                        onChange={onStartDateChange}
+                      />
+                    )}
+                  </View>
 
-                <View className="mb-4">
-                  <Text className="mb-2 text-sm font-medium text-gray-500">Partner's Birthday</Text>
-                  <TouchableOpacity
-                    className="rounded-lg border border-gray-300 px-4 py-3"
-                    onPress={() => setShowBirthdatePicker(true)}>
-                    <Text className="text-gray-800">
-                      {partnerBirthdate ? formatDate(partnerBirthdate) : 'Select date'}
+                  <View className="mb-4">
+                    <Text className="mb-2 text-sm font-medium text-gray-500">Anniversary Date</Text>
+                    <TouchableOpacity
+                      className="rounded-lg border border-gray-300 px-4 py-3"
+                      onPress={() => setShowAnniversaryPicker(true)}>
+                      <Text className="text-gray-800">
+                        {anniversaryDate ? formatDate(anniversaryDate) : 'Select date'}
+                      </Text>
+                    </TouchableOpacity>
+                    {showAnniversaryPicker && (
+                      <DateTimePicker
+                        value={anniversaryDate || new Date()}
+                        mode="date"
+                        display="default"
+                        onChange={onAnniversaryChange}
+                      />
+                    )}
+                  </View>
+
+                  <View className="mb-4">
+                    <Text className="mb-2 text-sm font-medium text-gray-500">
+                      Partner's Birthday
                     </Text>
-                  </TouchableOpacity>
-                  {showBirthdatePicker && (
-                    <DateTimePicker
-                      value={partnerBirthdate || new Date()}
-                      mode="date"
-                      display="default"
-                      onChange={onBirthdateChange}
-                    />
-                  )}
-                </View>
-              </>
-            )}
+                    <TouchableOpacity
+                      className="rounded-lg border border-gray-300 px-4 py-3"
+                      onPress={() => setShowBirthdatePicker(true)}>
+                      <Text className="text-gray-800">
+                        {partnerBirthdate ? formatDate(partnerBirthdate) : 'Select date'}
+                      </Text>
+                    </TouchableOpacity>
+                    {showBirthdatePicker && (
+                      <DateTimePicker
+                        value={partnerBirthdate || new Date()}
+                        mode="date"
+                        display="default"
+                        onChange={onBirthdateChange}
+                      />
+                    )}
+                  </View>
+                </>
+              )}
+            </View>
+
+            {/* Notification Preferences */}
+            <View className="mb-6">
+              <Text className="mb-4 text-lg font-semibold text-gray-700">
+                Notification Preferences
+              </Text>
+
+              <View className="mb-4">
+                <Text className="mb-2 text-sm font-medium text-gray-500">Phone Number</Text>
+                <TextInput
+                  className="rounded-lg border border-gray-300 px-4 py-3 text-gray-800"
+                  value={phoneNumber}
+                  onChangeText={setPhoneNumber}
+                  placeholder="Enter phone number for SMS notifications"
+                  keyboardType="phone-pad"
+                />
+              </View>
+
+              <View className="mb-4 flex-row items-center justify-between">
+                <Text className="text-sm font-medium text-gray-500">Email Notifications</Text>
+                <Switch
+                  value={emailNotifications}
+                  onValueChange={setEmailNotifications}
+                  trackColor={{ false: '#767577', true: '#818CF8' }}
+                  thumbColor={emailNotifications ? '#6366F1' : '#f4f3f4'}
+                />
+              </View>
+
+              <View className="mb-4 flex-row items-center justify-between">
+                <Text className="text-sm font-medium text-gray-500">Text Notifications</Text>
+                <Switch
+                  value={textNotifications}
+                  onValueChange={setTextNotifications}
+                  trackColor={{ false: '#767577', true: '#818CF8' }}
+                  thumbColor={textNotifications ? '#6366F1' : '#f4f3f4'}
+                />
+              </View>
+
+              <View className="mb-4 flex-row items-center justify-between">
+                <Text className="text-sm font-medium text-gray-500">Push Notifications</Text>
+                <Switch
+                  value={pushNotifications}
+                  onValueChange={setPushNotifications}
+                  trackColor={{ false: '#767577', true: '#818CF8' }}
+                  thumbColor={pushNotifications ? '#6366F1' : '#f4f3f4'}
+                />
+              </View>
+            </View>
+
+            <TouchableOpacity
+              className="mt-6 items-center rounded-lg bg-indigo-600 px-4 py-3"
+              onPress={handleSave}
+              disabled={updating}>
+              {updating ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <Text className="font-semibold text-white">Save Changes</Text>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              className="mt-3 rounded-lg border border-gray-400 px-4 py-3"
+              onPress={() => navigation.goBack()}
+              disabled={updating}>
+              <Text className="text-center font-semibold text-gray-600">Cancel</Text>
+            </TouchableOpacity>
           </View>
-
-          {/* Notification Preferences */}
-          <View className="mb-6">
-            <Text className="mb-4 text-lg font-semibold text-gray-700">
-              Notification Preferences
-            </Text>
-
-            <View className="mb-4">
-              <Text className="mb-2 text-sm font-medium text-gray-500">Phone Number</Text>
-              <TextInput
-                className="rounded-lg border border-gray-300 px-4 py-3 text-gray-800"
-                value={phoneNumber}
-                onChangeText={setPhoneNumber}
-                placeholder="Enter phone number for SMS notifications"
-                keyboardType="phone-pad"
-              />
-            </View>
-
-            <View className="mb-4 flex-row items-center justify-between">
-              <Text className="text-sm font-medium text-gray-500">Email Notifications</Text>
-              <Switch
-                value={emailNotifications}
-                onValueChange={setEmailNotifications}
-                trackColor={{ false: '#767577', true: '#818CF8' }}
-                thumbColor={emailNotifications ? '#6366F1' : '#f4f3f4'}
-              />
-            </View>
-
-            <View className="mb-4 flex-row items-center justify-between">
-              <Text className="text-sm font-medium text-gray-500">Text Notifications</Text>
-              <Switch
-                value={textNotifications}
-                onValueChange={setTextNotifications}
-                trackColor={{ false: '#767577', true: '#818CF8' }}
-                thumbColor={textNotifications ? '#6366F1' : '#f4f3f4'}
-              />
-            </View>
-
-            <View className="mb-4 flex-row items-center justify-between">
-              <Text className="text-sm font-medium text-gray-500">Push Notifications</Text>
-              <Switch
-                value={pushNotifications}
-                onValueChange={setPushNotifications}
-                trackColor={{ false: '#767577', true: '#818CF8' }}
-                thumbColor={pushNotifications ? '#6366F1' : '#f4f3f4'}
-              />
-            </View>
-          </View>
-
-          <TouchableOpacity
-            className="mt-6 items-center rounded-lg bg-indigo-600 px-4 py-3"
-            onPress={handleSave}
-            disabled={updating}>
-            {updating ? (
-              <ActivityIndicator size="small" color="white" />
-            ) : (
-              <Text className="font-semibold text-white">Save Changes</Text>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            className="mt-3 rounded-lg border border-gray-400 px-4 py-3"
-            onPress={() => navigation.goBack()}
-            disabled={updating}>
-            <Text className="text-center font-semibold text-gray-600">Cancel</Text>
-          </TouchableOpacity>
         </View>
-      </View>
+      </GradientBackground>
     </ScrollView>
   );
 };

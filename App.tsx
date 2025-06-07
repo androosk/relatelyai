@@ -17,6 +17,7 @@ import { ChatStackNavigator } from 'components/navigation/ChatStack';
 import SignInScreen from './components/screens/auth/SignInScreen';
 import SignUpScreen from './components/screens/auth/SignUpScreen';
 import { AuthProvider, useAuth } from './components/contexts/AuthContext';
+import { GradientBackground } from 'components/ui/GradientBackground';
 
 export type RootStackParamList = {
   App: undefined;
