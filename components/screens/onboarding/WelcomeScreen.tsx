@@ -3,35 +3,24 @@ import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { GradientBackground } from 'components/ui/GradientBackground';
 import { useThemedStyles } from 'hooks/useThemedStyles';
+import { useNavigation } from '@react-navigation/native';
+import type { OnboardingStackParamList } from 'components/navigation/OnboardingStack';
 
-type OnboardingStackParamList = {
-  Welcome: undefined;
-  Questions: undefined;
-  // Add other onboarding steps here
-};
+type NavigationProp = NativeStackNavigationProp<OnboardingStackParamList, 'Welcome'>;
 
-type OnboardingWelcomeScreenProps = {
-  navigation: NativeStackNavigationProp<OnboardingStackParamList, 'Welcome'>;
-};
-
-const OnboardingWelcomeScreen: React.FC<OnboardingWelcomeScreenProps> = ({ navigation }) => {
+export default function OnboardingWelcomeScreen() {
+  const navigation = useNavigation<NavigationProp>();
   const styles = useThemedStyles();
 
   const handleContinue = () => {
-    // Navigate to the next onboarding step
-    navigation.navigate('Questions');
+    navigation.navigate('PersonalInfo');
   };
 
   return (
     <GradientBackground>
       <View className="flex-1 items-center justify-center p-6">
-        {/* Illustration */}
-        <View className="">
-          <Image
-            source={require('assets/welcome-image.png')} // Update path to your image
-            // className="h-80 w-80"
-            resizeMode="contain"
-          />
+        <View>
+          <Image source={require('assets/welcome-image.png')} resizeMode="contain" />
         </View>
 
         {/* Welcome Text */}
@@ -54,6 +43,4 @@ const OnboardingWelcomeScreen: React.FC<OnboardingWelcomeScreenProps> = ({ navig
       </View>
     </GradientBackground>
   );
-};
-
-export default OnboardingWelcomeScreen;
+}

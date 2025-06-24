@@ -7,6 +7,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ActivityIndicator, View } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { ChatProvider } from 'components/contexts/ChatContext';
+import { useEffect, useState } from 'react';
+import { profileService } from 'components/services/profileService';
 import CheckInScreen from './components/screens/CheckInScreen';
 import ResourcesScreen from './components/screens/ResourcesScreen';
 import HomeScreen from './components/screens/HomeScreen';
@@ -18,12 +20,13 @@ import SignInScreen from './components/screens/auth/SignInScreen';
 import SignUpScreen from './components/screens/auth/SignUpScreen';
 import { AuthProvider, useAuth } from './components/contexts/AuthContext';
 import { GradientBackground } from 'components/ui/GradientBackground';
-import OnboardingWelcomeScreen from 'components/screens/onboarding/WelcomeScreen';
+import { OnboardingStackNavigator } from 'components/navigation/OnboardingStack';
 
 export type RootStackParamList = {
   App: undefined;
   SignIn: undefined;
   SignUp: undefined;
+  Onboarding: undefined;
   Profile: undefined;
   EditProfile: undefined;
 };
@@ -74,8 +77,28 @@ function MainTabs() {
 
 const RootNavigator = () => {
   const { user, loading } = useAuth();
+  const [needsOnboarding, setNeedsOnboarding] = useState(false);
+  const [checkingProfile, setCheckingProfile] = useState(true);
 
-  if (loading) {
+  useEffect(() => {
+    const checkOnboardingStatus = async () => {
+      if (user) {
+        try {
+          const profile = await profileService.getProfile();
+          // Check if user has completed basic onboarding (has first name)
+          setNeedsOnboarding(!profile?.first_name);
+        } catch (error) {
+          console.error('Error checking profile:', error);
+          setNeedsOnboarding(true);
+        }
+      }
+      setCheckingProfile(false);
+    };
+
+    checkOnboardingStatus();
+  }, [user]);
+
+  if (loading || checkingProfile) {
     return (
       <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" color="#6366f1" />
@@ -86,17 +109,26 @@ const RootNavigator = () => {
   return (
     <Stack.Navigator>
       {user ? (
-        <>
-          <Stack.Screen name="App" component={MainTabs} options={{ headerShown: false }} />
-          <Stack.Screen name="Profile" component={ProfileScreen} />
-          <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-        </>
+        needsOnboarding ? (
+          <Stack.Screen
+            name="Onboarding"
+            component={OnboardingStackNavigator}
+            options={{ headerShown: false }}
+          />
+        ) : (
+          <>
+            <Stack.Screen name="App" component={MainTabs} options={{ headerShown: false }} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+          </>
+        )
       ) : (
         <>
           <Stack.Screen name="SignIn" component={SignInScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
           <Stack.Screen
-            name="SignUp"
-            component={OnboardingWelcomeScreen}
+            name="Onboarding"
+            component={OnboardingStackNavigator}
             options={{ headerShown: false }}
           />
         </>
