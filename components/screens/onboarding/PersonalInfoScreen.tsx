@@ -26,7 +26,7 @@ export default function PersonalInfoScreen() {
   const navigation = useNavigation<NavigationProp>();
   const styles = useThemedStyles();
   const { user } = useAuth();
-  
+
   const [firstName, setFirstName] = useState('');
   const [birthday, setBirthday] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -37,11 +37,11 @@ export default function PersonalInfoScreen() {
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
-    
+
     return age;
   };
 
@@ -73,14 +73,8 @@ export default function PersonalInfoScreen() {
         age: age,
       });
 
-      // TODO: Navigate to next onboarding screen when available
-      // For now, navigate to main app
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{ name: 'App' as never }],
-        })
-      );
+      // Navigate to relationship status screen
+      navigation.navigate('RelationshipStatus');
     } catch (error) {
       console.error('Error updating profile:', error);
       Alert.alert('Error', 'Failed to save your information. Please try again.');
@@ -90,8 +84,11 @@ export default function PersonalInfoScreen() {
   };
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
+    const currentMode = event.type;
     setShowDatePicker(Platform.OS === 'ios');
-    if (selectedDate) {
+    
+    // Only set the date if user pressed "OK" (not "Cancel")
+    if (currentMode === 'set' && selectedDate) {
       setBirthday(selectedDate);
     }
   };
@@ -130,7 +127,7 @@ export default function PersonalInfoScreen() {
           contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
-          <View className="flex-1 px-6 py-8">
+          <View className="flex-1 px-6 pb-8 pt-24">
             <View className="mb-8">
               <Text className={`text-3xl font-bold ${styles.textPrimary}`}>
                 Let's get to know you
@@ -141,9 +138,7 @@ export default function PersonalInfoScreen() {
             </View>
 
             <View className="mb-6">
-              <Text className={`mb-2 text-base font-medium ${styles.textPrimary}`}>
-                First Name
-              </Text>
+              <Text className={`mb-2 text-base font-medium ${styles.textPrimary}`}>First Name</Text>
               <TextInput
                 value={firstName}
                 onChangeText={setFirstName}
@@ -154,9 +149,7 @@ export default function PersonalInfoScreen() {
             </View>
 
             <View className="mb-6">
-              <Text className={`mb-2 text-base font-medium ${styles.textPrimary}`}>
-                Birthday
-              </Text>
+              <Text className={`mb-2 text-base font-medium ${styles.textPrimary}`}>Birthday</Text>
               <TouchableOpacity
                 onPress={() => setShowDatePicker(true)}
                 className={`h-14 justify-center rounded-xl px-4 ${styles.border} border ${styles.cardBackground}`}>
@@ -164,7 +157,7 @@ export default function PersonalInfoScreen() {
                   {formatDate(birthday)}
                 </Text>
               </TouchableOpacity>
-              
+
               {showDatePicker && (
                 <DateTimePicker
                   value={birthday}
@@ -177,9 +170,7 @@ export default function PersonalInfoScreen() {
             </View>
 
             <View className="mb-8">
-              <Text className={`mb-3 text-base font-medium ${styles.textPrimary}`}>
-                Gender
-              </Text>
+              <Text className={`mb-3 text-base font-medium ${styles.textPrimary}`}>Gender</Text>
               <View className="flex-row gap-3">
                 <GenderButton value="female" label="Female" />
                 <GenderButton value="male" label="Male" />

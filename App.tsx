@@ -9,6 +9,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { ChatProvider } from 'components/contexts/ChatContext';
 import { useEffect, useState } from 'react';
 import { profileService } from 'components/services/profileService';
+import { useDeepLinking } from 'hooks/useDeepLinking';
 import CheckInScreen from './components/screens/CheckInScreen';
 import ResourcesScreen from './components/screens/ResourcesScreen';
 import HomeScreen from './components/screens/HomeScreen';
@@ -138,6 +139,8 @@ const RootNavigator = () => {
 };
 
 export default function App() {
+  useDeepLinking();
+  
   return (
     <ThemeProvider>
       <NavigationContainer>
