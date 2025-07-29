@@ -4,6 +4,9 @@ import { useNavigation } from '@react-navigation/native';
 import { GradientBackground } from 'components/ui/GradientBackground';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useThemedStyles } from 'hooks/useThemedStyles';
+import { profileService } from 'components/services/profileService';
+import { useAuth } from 'components/contexts/AuthContext';
+import { supabase } from 'api/supabase';
 import type { OnboardingStackParamList } from 'components/navigation/OnboardingStack';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -44,6 +47,7 @@ const PLANS: PlanOption[] = [
 export default function SubscriptionScreen() {
   const navigation = useNavigation<NavigationProp>();
   const styles = useThemedStyles();
+  const { user } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState<string>('yearly');
   const [loading, setLoading] = useState(false);
 
@@ -53,13 +57,23 @@ export default function SubscriptionScreen() {
       // TODO: Implement actual IAP subscription logic
       console.log('Starting subscription for plan:', selectedPlan);
       
-      // For now, just navigate to main app
-      setTimeout(() => {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'App' as never }],
+      // Since we already have first_name from earlier onboarding steps,
+      // the app should recognize onboarding is complete
+      // We just need to trigger a re-render of the root navigator
+      
+      // Save subscription status
+      if (user) {
+        await profileService.updateProfile({
+          subscription_status: 'trial_started',
         });
-      }, 1000);
+      }
+      
+      // Force a re-authentication to trigger navigation update
+      // This will cause the AuthContext to update and App.tsx to re-render
+      const { data } = await supabase.auth.refreshSession();
+      if (data.session) {
+        await supabase.auth.setSession(data.session);
+      }
     } catch (error) {
       console.error('Subscription error:', error);
       Alert.alert('Error', 'Unable to process subscription. Please try again.');
@@ -76,11 +90,18 @@ export default function SubscriptionScreen() {
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Skip',
-          onPress: () => {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: 'App' as never }],
-            });
+          onPress: async () => {
+            try {
+              // Force a re-authentication to trigger navigation update
+              const { data } = await supabase.auth.refreshSession();
+              if (data.session) {
+                await supabase.auth.setSession(data.session);
+              }
+            } catch (error) {
+              console.error('Error skipping subscription:', error);
+              // If refresh fails, try signing out and back in
+              Alert.alert('Please restart the app to continue');
+            }
           },
         },
       ]

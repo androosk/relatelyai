@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useNavigation, CommonActions } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { GradientBackground } from 'components/ui/GradientBackground';
 import { useThemedStyles } from 'hooks/useThemedStyles';
 import { profileService } from 'components/services/profileService';

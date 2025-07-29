@@ -55,7 +55,7 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ navigation, mode }) => {
             password,
           });
           if (error) throw error;
-          Alert.alert('Success', 'Account created! You can now sign in.');
+          Alert.alert('Success', 'Account created! Please check your email to verify your account before signing in.');
         } else {
           const { error } = await supabase.auth.signInWithPassword({
             email,

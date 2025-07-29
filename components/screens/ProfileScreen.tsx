@@ -12,6 +12,15 @@ type ProfileScreenProps = {
   navigation: ProfileScreenNavigationProp;
 };
 
+const formatRelationshipStatus = (status: string | undefined): string => {
+  if (!status) return 'Not set';
+  // Convert snake_case to Title Case
+  return status
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [userProfile, setUserProfile] = useState<Profile>();
@@ -78,7 +87,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
           <View className="mb-4">
             <Text className="mb-1 text-sm font-medium text-gray-500">Relationship Status</Text>
             <Text className="text-lg font-medium text-gray-800">
-              {userProfile?.relationship_status || 'Not set'}
+              {formatRelationshipStatus(userProfile?.relationship_status)}
             </Text>
           </View>
 
